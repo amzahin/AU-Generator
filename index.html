@@ -1239,6 +1239,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
       const verified = document.getElementById('twVerified').value;
       const text = document.getElementById('twText').value;
       const time = document.getElementById('twTime').value;
+      const isLight = phoneTheme === 'light';
 
       document.getElementById('twPreviewName').innerText = name;
       document.getElementById('twPreviewHandle').innerText = handle.startsWith('@') ? handle : `@${handle}`;
@@ -1251,6 +1252,9 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
       const privateBanner = document.getElementById('twPrivateBanner');
       const metricsControls = document.getElementById('twMetricsContainer');
 
+      // Membaiki warna teks metrik ikut tema (Light / Dark)
+      const numClass = isLight ? "font-bold text-gray-900" : "font-bold text-white";
+
       if (privacy === 'private') {
         lockIcon.classList.remove('hidden');
         metricsBox.classList.add('hidden');
@@ -1262,9 +1266,17 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
         privateBanner.classList.add('hidden');
         metricsControls.classList.remove('hidden');
 
-        document.getElementById('twCountRetweets').innerText = document.getElementById('twRetweets').value;
-        document.getElementById('twCountLikes').innerText = document.getElementById('twLikes').value;
-        document.getElementById('twCountViews').innerText = document.getElementById('twViews').value;
+        const retweetsEl = document.getElementById('twCountRetweets');
+        const likesEl = document.getElementById('twCountLikes');
+        const viewsEl = document.getElementById('twCountViews');
+
+        retweetsEl.innerText = document.getElementById('twRetweets').value;
+        likesEl.innerText = document.getElementById('twLikes').value;
+        viewsEl.innerText = document.getElementById('twViews').value;
+
+        retweetsEl.className = numClass;
+        likesEl.className = numClass;
+        viewsEl.className = numClass;
       }
 
       const badge = document.getElementById('twPreviewBadge');
@@ -1428,7 +1440,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
               <p class="text-[12.5px] leading-relaxed break-words">${m.text || ''}</p>`;
           } else if (m.type === 'deleted') {
             contentHTML = `<p class="text-[12.5px] leading-relaxed italic text-gray-400/90 flex items-center gap-1.5"><i class="fa-solid fa-ban text-xs"></i> This message was deleted</p>`;
-            hideMeta = true; // Dibuang masa & tick bagi deleted message
+            hideMeta = true;
           } else if (m.type === 'image') {
             contentHTML = `<img src="${m.src}" class="rounded-lg max-w-full max-h-48 object-cover mb-1">`;
           } else if (m.type === 'sticker') {
