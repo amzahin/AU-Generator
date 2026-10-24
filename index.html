@@ -34,6 +34,13 @@
     }
 
     .cropper-container { max-height: 300px !important; }
+    
+    /* Ratio 4:5 Container Utility */
+    .ratio-4-5 {
+      aspect-ratio: 4 / 5;
+      width: 100%;
+      max-width: 400px;
+    }
   </style>
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans min-h-screen flex flex-col md:flex-row">
@@ -47,16 +54,19 @@
         <h1 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
           <i class="fa-solid fa-mobile-screen"></i> AU Generator
         </h1>
-        <p class="text-xs text-gray-400">Reka cerita AU (WhatsApp & Twitter/X)</p>
+        <p class="text-xs text-gray-400">Reka cerita AU (WhatsApp, Twitter & Simple Text)</p>
       </div>
 
-      <!-- App Mode Switcher (WhatsApp vs Twitter) -->
+      <!-- App Mode Switcher (WhatsApp vs Twitter vs Text) -->
       <div class="flex bg-gray-900 border border-gray-700 p-1 rounded-lg">
-        <button id="btnAppWA" onclick="switchAppMode('wa')" class="px-3 py-1.5 rounded-md text-xs font-bold transition bg-emerald-600 text-white flex items-center gap-1.5" title="WhatsApp Mode">
-          <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+        <button id="btnAppWA" onclick="switchAppMode('wa')" class="px-2.5 py-1.5 rounded-md text-xs font-bold transition bg-emerald-600 text-white flex items-center gap-1" title="WhatsApp Mode">
+          <i class="fa-brands fa-whatsapp text-sm"></i> WA
         </button>
-        <button id="btnAppTwitter" onclick="switchAppMode('twitter')" class="px-3 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1.5" title="Twitter / X Mode">
-          <i class="fa-brands fa-x-twitter text-sm"></i> Twitter / X
+        <button id="btnAppTwitter" onclick="switchAppMode('twitter')" class="px-2.5 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1" title="Twitter / X Mode">
+          <i class="fa-brands fa-x-twitter text-sm"></i> X
+        </button>
+        <button id="btnAppText" onclick="switchAppMode('text')" class="px-2.5 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1" title="Simple Text Mode">
+          <i class="fa-solid fa-align-left text-sm"></i> Text
         </button>
       </div>
     </div>
@@ -65,7 +75,15 @@
     <div class="flex justify-between items-center bg-gray-900 border border-gray-800 p-2.5 rounded-xl">
       <span class="text-xs font-semibold text-gray-300" id="currentModeLabel">WhatsApp Mode</span>
       <div class="flex gap-2">
-        <button id="btnPhoneTheme" onclick="togglePhoneTheme()" class="px-2.5 py-1 rounded-lg border border-gray-700 text-xs font-semibold bg-gray-950 text-yellow-400 hover:bg-gray-800 transition" title="Tukar Mod Tema Telefon (Light/Dark)">
+        <div id="waLayoutToggle" class="flex bg-gray-950 border border-gray-700 p-0.5 rounded-lg">
+          <button id="btnLayoutPhone" onclick="switchPhoneLayout('phone')" class="px-2.5 py-1 rounded-md text-xs font-semibold transition bg-emerald-600 text-white" title="Phone Frame Mode">
+            <i class="fa-solid fa-mobile-screen"></i> Phone
+          </button>
+          <button id="btnLayoutSimple" onclick="switchPhoneLayout('simple')" class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-gray-400 hover:text-white" title="Simple 4:5 Mode">
+            <i class="fa-solid fa-expand"></i> 4:5 Simple
+          </button>
+        </div>
+        <button id="btnPhoneTheme" onclick="togglePhoneTheme()" class="px-2.5 py-1 rounded-lg border border-gray-700 text-xs font-semibold bg-gray-950 text-yellow-400 hover:bg-gray-800 transition" title="Tukar Mod Tema (Light/Dark)">
           <i id="themeIcon" class="fa-solid fa-moon"></i>
         </button>
         <div id="waSubToggle" class="flex bg-gray-950 border border-gray-700 p-0.5 rounded-lg">
@@ -391,6 +409,99 @@
 
     </div>
 
+    <!-- ==================== SIMPLE TEXT CONTROLS ==================== -->
+    <div id="textControls" class="space-y-6 hidden">
+      <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl space-y-4">
+        <h2 class="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-align-left"></i> Tetapan Simple Text (4:5)
+        </h2>
+
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Kandungan Teks / Naratif</label>
+          <textarea id="stContent" rows="6" oninput="renderSimpleText()" placeholder="Taip nukilan, sajak, atau dialog cerita di sini..." class="w-full bg-gray-950 border border-gray-700 rounded-lg p-3 text-sm outline-none focus:border-amber-500 leading-relaxed">"Kadang-kadang, kita bukan mencari jawapan yang betul...
+Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
+        </div>
+
+        <!-- Background Color & Palettes -->
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-gray-300">Warna Background (Latar Belakang)</label>
+          <div class="flex items-center gap-2">
+            <input type="color" id="stBgColor" value="#0f172a" onchange="setStBg(this.value)" class="h-9 w-12 bg-gray-950 border border-gray-700 rounded-lg cursor-pointer">
+            <span class="text-xs text-gray-400">Atau pilih palet awam/soft:</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <button onclick="setStBg('#0f172a')" class="w-6 h-6 rounded-full bg-slate-950 border border-gray-700" title="Dark Slate"></button>
+            <button onclick="setStBg('#1e293b')" class="w-6 h-6 rounded-full bg-slate-800" title="Slate"></button>
+            <button onclick="setStBg('#f8fafc')" class="w-6 h-6 rounded-full bg-slate-50" title="Clean White"></button>
+            <button onclick="setStBg('#fdf2f8')" class="w-6 h-6 rounded-full bg-pink-50" title="Soft Pink"></button>
+            <button onclick="setStBg('#fef3c7')" class="w-6 h-6 rounded-full bg-amber-100" title="Soft Pastel Yellow"></button>
+            <button onclick="setStBg('#f1f5f9')" class="w-6 h-6 rounded-full bg-slate-100" title="Soft Grey"></button>
+            <button onclick="setStBg('#ecfdf5')" class="w-6 h-6 rounded-full bg-emerald-50" title="Soft Mint"></button>
+            <button onclick="setStBg('#e0f2fe')" class="w-6 h-6 rounded-full bg-sky-100" title="Soft Pastel Blue"></button>
+            <button onclick="setStBg('#27272a')" class="w-6 h-6 rounded-full bg-zinc-800" title="Dark Zinc"></button>
+          </div>
+        </div>
+
+        <!-- Text Color & Palettes -->
+        <div class="space-y-2 border-t border-gray-800 pt-3">
+          <label class="block text-xs font-semibold text-gray-300">Warna Teks</label>
+          <div class="flex items-center gap-2">
+            <input type="color" id="stTextColor" value="#f8fafc" onchange="setStTextCol(this.value)" class="h-9 w-12 bg-gray-950 border border-gray-700 rounded-lg cursor-pointer">
+            <span class="text-xs text-gray-400">Palet warna teks:</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <button onclick="setStTextCol('#f8fafc')" class="w-6 h-6 rounded-full bg-slate-50 border border-gray-700" title="White"></button>
+            <button onclick="setStTextCol('#334155')" class="w-6 h-6 rounded-full bg-slate-700" title="Dark Slate"></button>
+            <button onclick="setStTextCol('#0f172a')" class="w-6 h-6 rounded-full bg-slate-950" title="Black"></button>
+            <button onclick="setStTextCol('#e11d48')" class="w-6 h-6 rounded-full bg-rose-600" title="Rose Red"></button>
+            <button onclick="setStTextCol('#d97706')" class="w-6 h-6 rounded-full bg-amber-600" title="Amber"></button>
+            <button onclick="setStTextCol('#059669')" class="w-6 h-6 rounded-full bg-emerald-600" title="Emerald"></button>
+            <button onclick="setStTextCol('#0284c7')" class="w-6 h-6 rounded-full bg-sky-600" title="Sky Blue"></button>
+            <button onclick="setStTextCol('#9333ea')" class="w-6 h-6 rounded-full bg-purple-600" title="Purple"></button>
+          </div>
+        </div>
+
+        <!-- Highlight Color & Palettes -->
+        <div class="space-y-2 border-t border-gray-800 pt-3">
+          <label class="block text-xs font-semibold text-gray-300">Warna Highlight Teks (Guna Tag `==teks==` atau pilih)</label>
+          <div class="flex items-center gap-2">
+            <input type="color" id="stHighlightColor" value="#fde047" onchange="renderSimpleText()" class="h-9 w-12 bg-gray-950 border border-gray-700 rounded-lg cursor-pointer">
+            <span class="text-xs text-gray-400">Palet Highlight:</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <button onclick="setStHighlight('#fde047')" class="w-6 h-6 rounded-full bg-yellow-300" title="Yellow"></button>
+            <button onclick="setStHighlight('#fbcfe8')" class="w-6 h-6 rounded-full bg-pink-200" title="Soft Pink"></button>
+            <button onclick="setStHighlight('#bfdbfe')" class="w-6 h-6 rounded-full bg-blue-200" title="Soft Blue"></button>
+            <button onclick="setStHighlight('#bbf7d0')" class="w-6 h-6 rounded-full bg-green-200" title="Soft Green"></button>
+            <button onclick="setStHighlight('#fed7aa')" class="w-6 h-6 rounded-full bg-orange-200" title="Soft Orange"></button>
+            <button onclick="setStHighlight('transparent')" class="w-6 h-6 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center text-[10px]" title="Tiada">✕</button>
+          </div>
+          <p class="text-[11px] text-gray-400 pt-1">Tip: Letakkan perkataan di dalam kurungan simbol <code class="bg-gray-950 px-1 py-0.5 rounded text-amber-400">==perkataan==</code> untuk di-highlight secara automatik.</p>
+        </div>
+
+        <!-- Font Style & Alignment -->
+        <div class="grid grid-cols-2 gap-3 border-t border-gray-800 pt-3">
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">Gaya Font</label>
+            <select id="stFontFamily" onchange="renderSimpleText()" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-xs outline-none">
+              <option value="font-sans">Moden Sans</option>
+              <option value="font-serif">Klasik Serif (Novel)</option>
+              <option value="font-mono">Monospace (Typewriter)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">Jajaran Teks</label>
+            <select id="stTextAlign" onchange="renderSimpleText()" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-xs outline-none">
+              <option value="text-left">Kiri</option>
+              <option value="text-center" selected>Tengah</option>
+              <option value="text-right">Kanan</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- 3. URUSAN SENARAI MESEJ & EKSPORT (UNIVERSAL) -->
     <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl space-y-3">
       <div class="flex justify-between items-center">
@@ -401,7 +512,7 @@
 
       <div class="pt-3 border-t border-gray-800 flex gap-2">
         <button onclick="exportPNG()" class="flex-1 bg-blue-600 hover:bg-blue-500 py-2 rounded-lg font-bold text-xs text-white flex items-center justify-center gap-1.5">
-          <i class="fa-solid fa-download"></i> Download PNG
+          <i class="fa-solid fa-download"></i> Download PNG (Ratio 4:5)
         </button>
       </div>
     </div>
@@ -411,10 +522,10 @@
   <!-- ==================== RIGHT PANEL: MOBILE PREVIEW ==================== -->
   <div class="w-full md:w-1/2 lg:w-7/12 bg-gray-950 p-4 flex items-center justify-center min-h-screen">
 
-    <!-- Phone Frame / Mockup View -->
-    <div id="phoneFrame" class="w-full max-w-[380px] h-[720px] bg-[#0b141a] rounded-[30px] border-4 border-gray-800 shadow-2xl flex flex-col overflow-hidden relative border-opacity-80">
+    <!-- Phone Frame / Simple 4:5 Container -->
+    <div id="phoneFrame" class="w-full max-w-[380px] h-[720px] bg-[#0b141a] rounded-[30px] border-4 border-gray-800 shadow-2xl flex flex-col overflow-hidden relative border-opacity-80 transition-all duration-300">
 
-      <!-- Top Bar / Status Bar -->
+      <!-- Top Bar / Status Bar (Phone Mode Only) -->
       <div id="phoneStatusBar" class="bg-[#111b21] px-6 pt-3 pb-2 flex justify-between items-center text-xs text-gray-400 select-none">
         <span id="currentTime">10:45</span>
         <div class="flex items-center gap-1.5 text-xs">
@@ -506,6 +617,13 @@
 
       </div>
 
+      <!-- SIMPLE TEXT VIEW -->
+      <div id="textPreviewContainer" class="flex-1 flex flex-col items-center justify-center p-8 bg-slate-950 text-slate-100 hidden">
+        <div id="stCardBox" class="w-full max-w-sm text-center space-y-4">
+          <p id="stOutputText" class="text-base leading-relaxed font-sans"></p>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -528,7 +646,8 @@
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
-    let appMode = 'wa'; // 'wa' or 'twitter'
+    let appMode = 'wa'; // 'wa', 'twitter', 'text'
+    let phoneLayout = 'phone'; // 'phone' or 'simple' (4:5)
     let phoneTheme = 'dark'; // 'dark' or 'light'
     let currentMode = 'dm'; // 'dm' or 'group'
 
@@ -537,7 +656,6 @@
       { id: '1', name: 'Pengguna', color: '#f59e0b', pfp: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80' }
     ];
 
-    // Cleaned WhatsApp Messages
     let messages = [];
 
     let targetProfile = {
@@ -551,18 +669,22 @@
       pfp: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=100&q=80'
     };
 
-    // Wallpaper Settings State
     let waWallpaper = {
-      type: 'pattern', // 'pattern', 'color', 'image'
+      type: 'pattern',
       color: '#0b141a',
       image: ''
     };
 
-    // Twitter State
     let twitterData = {
       pfp: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
       media: '',
       replies: []
+    };
+
+    let simpleTextConfig = {
+      bg: '#0f172a',
+      color: '#f8fafc',
+      highlight: '#fde047'
     };
 
     let cropperInstance = null;
@@ -573,40 +695,84 @@
       renderMessages();
       updateHeader();
       renderTwitter();
+      renderSimpleText();
     };
 
-    // Switch App Mode (WhatsApp vs Twitter)
+    // Switch App Mode
     function switchAppMode(mode) {
       appMode = mode;
       const btnWA = document.getElementById('btnAppWA');
       const btnTwitter = document.getElementById('btnAppTwitter');
+      const btnText = document.getElementById('btnAppText');
       const waControls = document.getElementById('waControls');
       const twitterControls = document.getElementById('twitterControls');
+      const textControls = document.getElementById('textControls');
       const waPreview = document.getElementById('waPreviewContainer');
       const twitterPreview = document.getElementById('twitterPreviewContainer');
+      const textPreview = document.getElementById('textPreviewContainer');
+      const waLayoutToggle = document.getElementById('waLayoutToggle');
       const waSubToggle = document.getElementById('waSubToggle');
       const label = document.getElementById('currentModeLabel');
 
+      // Reset Active Classes
+      btnWA.className = "px-2.5 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1";
+      btnTwitter.className = "px-2.5 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1";
+      btnText.className = "px-2.5 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1";
+
+      waControls.classList.add('hidden');
+      twitterControls.classList.add('hidden');
+      textControls.classList.add('hidden');
+      waPreview.classList.add('hidden');
+      twitterPreview.classList.add('hidden');
+      textPreview.classList.add('hidden');
+
       if (mode === 'wa') {
-        btnWA.className = "px-3 py-1.5 rounded-md text-xs font-bold transition bg-emerald-600 text-white flex items-center gap-1.5";
-        btnTwitter.className = "px-3 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1.5";
+        btnWA.className = "px-2.5 py-1.5 rounded-md text-xs font-bold transition bg-emerald-600 text-white flex items-center gap-1";
         waControls.classList.remove('hidden');
-        twitterControls.classList.add('hidden');
         waPreview.classList.remove('hidden');
-        twitterPreview.classList.add('hidden');
+        waLayoutToggle.classList.remove('hidden');
         waSubToggle.classList.remove('hidden');
         label.innerText = "WhatsApp Mode";
         renderMessages();
-      } else {
-        btnTwitter.className = "px-3 py-1.5 rounded-md text-xs font-bold transition bg-sky-600 text-white flex items-center gap-1.5";
-        btnWA.className = "px-3 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1.5";
+      } else if (mode === 'twitter') {
+        btnTwitter.className = "px-2.5 py-1.5 rounded-md text-xs font-bold transition bg-sky-600 text-white flex items-center gap-1";
         twitterControls.classList.remove('hidden');
-        waControls.classList.add('hidden');
         twitterPreview.classList.remove('hidden');
-        waPreview.classList.add('hidden');
+        waLayoutToggle.classList.remove('hidden');
         waSubToggle.classList.add('hidden');
         label.innerText = "Twitter / X Mode";
         renderTwitter();
+      } else if (mode === 'text') {
+        btnText.className = "px-2.5 py-1.5 rounded-md text-xs font-bold transition bg-amber-600 text-white flex items-center gap-1";
+        textControls.classList.remove('hidden');
+        textPreview.classList.remove('hidden');
+        waLayoutToggle.classList.add('hidden');
+        waSubToggle.classList.add('hidden');
+        label.innerText = "Simple Text Mode (4:5)";
+        // Force simple mode for text
+        switchPhoneLayout('simple');
+        renderSimpleText();
+      }
+    }
+
+    // Switch Phone Layout (Phone Frame vs Simple 4:5)
+    function switchPhoneLayout(layout) {
+      phoneLayout = layout;
+      const frame = document.getElementById('phoneFrame');
+      const statusBar = document.getElementById('phoneStatusBar');
+      const btnPhone = document.getElementById('btnLayoutPhone');
+      const btnSimple = document.getElementById('btnLayoutSimple');
+
+      if (layout === 'simple') {
+        btnSimple.className = "px-2.5 py-1 rounded-md text-xs font-semibold transition bg-emerald-600 text-white";
+        btnPhone.className = "px-2.5 py-1 rounded-md text-xs font-semibold transition text-gray-400 hover:text-white";
+        frame.className = "w-full ratio-4-5 bg-[#0b141a] rounded-2xl border-2 border-gray-800 shadow-2xl flex flex-col overflow-hidden relative transition-all duration-300";
+        statusBar.classList.add('hidden');
+      } else {
+        btnPhone.className = "px-2.5 py-1 rounded-md text-xs font-semibold transition bg-emerald-600 text-white";
+        btnSimple.className = "px-2.5 py-1 rounded-md text-xs font-semibold transition text-gray-400 hover:text-white";
+        frame.className = "w-full max-w-[380px] h-[720px] bg-[#0b141a] rounded-[30px] border-4 border-gray-800 shadow-2xl flex flex-col overflow-hidden relative border-opacity-80 transition-all duration-300";
+        if (appMode !== 'text') statusBar.classList.remove('hidden');
       }
     }
 
@@ -641,7 +807,7 @@
         twHeader.className = "px-4 py-2.5 border-b border-gray-800 flex items-center justify-between text-sm bg-black text-white";
       }
       if (appMode === 'wa') renderMessages();
-      else renderTwitter();
+      else if (appMode === 'twitter') renderTwitter();
     }
 
     // Wallpaper Functions
@@ -684,6 +850,54 @@
       }
     }
 
+    // Simple Text Customization
+    function setStBg(color) {
+      simpleTextConfig.bg = color;
+      document.getElementById('stBgColor').value = color;
+      renderSimpleText();
+    }
+
+    function setStTextCol(color) {
+      simpleTextConfig.color = color;
+      document.getElementById('stTextColor').value = color;
+      renderSimpleText();
+    }
+
+    function setStHighlight(color) {
+      simpleTextConfig.highlight = color;
+      if (color !== 'transparent') document.getElementById('stHighlightColor').value = color;
+      renderSimpleText();
+    }
+
+    function renderSimpleText() {
+      const container = document.getElementById('textPreviewContainer');
+      const textOutput = document.getElementById('stOutputText');
+      const rawText = document.getElementById('stContent').value;
+      const fontFamily = document.getElementById('stFontFamily').value;
+      const textAlign = document.getElementById('stTextAlign').value;
+      const highlightCol = document.getElementById('stHighlightColor').value;
+
+      container.style.backgroundColor = simpleTextConfig.bg;
+      textOutput.style.color = simpleTextConfig.color;
+      textOutput.className = `text-base leading-relaxed ${fontFamily} ${textAlign}`;
+
+      // Highlight syntax processing (e.g. ==text==)
+      let formatted = rawText.replace(/==(.*?)==/g, (match, p1) => {
+        let hlBg = simpleTextConfig.highlight === 'transparent' ? highlightCol : simpleTextConfig.highlight;
+        return `<span style="background-color: ${hlBg}; padding: 0 4px; border-radius: 4px; font-weight: 600;">${p1}</span>`;
+      });
+
+      textOutput.innerHTML = formatted;
+
+      const list = document.getElementById('itemList');
+      if (appMode === 'text') {
+        list.innerHTML = `
+          <div class="bg-gray-950 p-2 rounded flex justify-between items-center text-xs">
+            <span class="truncate max-w-[250px] text-gray-300">[Simple Text] ${rawText.substring(0, 30)}...</span>
+          </div>`;
+      }
+    }
+
     // Mode Switching for WA (DM vs Group)
     function switchChatMode(mode) {
       currentMode = mode;
@@ -708,7 +922,6 @@
       renderMessages();
     }
 
-    // WhatsApp Header Update
     function updateHeader() {
       const pfpImg = document.getElementById('headerPfp');
       const title = document.getElementById('headerTitle');
@@ -732,7 +945,6 @@
       }
     }
 
-    // Universal Crop Handler
     function triggerCropUpload(e, targetType) {
       const file = e.target.files[0];
       if (file) {
@@ -840,7 +1052,6 @@
       else if (type === 'call') callContainer.classList.remove('hidden');
     }
 
-    // Add WA Message
     async function addMessage() {
       const sender = document.getElementById('msgSender').value;
       const type = document.getElementById('msgType').value;
@@ -894,7 +1105,6 @@
       }
     }
 
-    // Twitter Reply Logic
     function addTwitterReply() {
       const name = document.getElementById('replyName').value || 'Anonym';
       const handle = document.getElementById('replyHandle').value || 'user';
@@ -934,7 +1144,6 @@
       }
     }
 
-    // Render Twitter Screen
     function renderTwitter() {
       const name = document.getElementById('twName').value;
       const handle = document.getElementById('twHandle').value;
@@ -949,7 +1158,6 @@
       document.getElementById('twPreviewTime').innerText = time;
       document.getElementById('twPreviewPfp').src = twitterData.pfp;
 
-      // Privacy Lock Icon
       const lockIcon = document.getElementById('twPreviewLock');
       const metricsBox = document.getElementById('twPreviewMetrics');
       const privateBanner = document.getElementById('twPrivateBanner');
@@ -971,12 +1179,10 @@
         document.getElementById('twCountViews').innerText = document.getElementById('twViews').value;
       }
 
-      // Verified Badge
       const badge = document.getElementById('twPreviewBadge');
       if (verified === 'blue') badge.classList.remove('hidden');
       else badge.classList.add('hidden');
 
-      // Media Image
       const mediaImg = document.getElementById('twPreviewMedia');
       if (twitterData.media) {
         mediaImg.src = twitterData.media;
@@ -985,7 +1191,6 @@
         mediaImg.classList.add('hidden');
       }
 
-      // Render Replies
       const repliesContainer = document.getElementById('twRepliesContainer');
       const list = document.getElementById('itemList');
       repliesContainer.innerHTML = '';
@@ -1022,7 +1227,6 @@
       renderTwitter();
     }
 
-    // Cropper Modal
     function openCropper(imageSrc, callback) {
       const modal = document.getElementById('cropperModal');
       const image = document.getElementById('cropperImage');
@@ -1046,7 +1250,6 @@
       }
     }
 
-    // Render WhatsApp Screen
     function renderMessages() {
       const chat = document.getElementById('chatContainer');
       const list = document.getElementById('itemList');
@@ -1190,9 +1393,12 @@
       if (appMode === 'wa') {
         messages = [];
         renderMessages();
-      } else {
+      } else if (appMode === 'twitter') {
         twitterData.replies = [];
         renderTwitter();
+      } else {
+        document.getElementById('stContent').value = '';
+        renderSimpleText();
       }
     }
 
