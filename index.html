@@ -57,7 +57,7 @@
         <p class="text-xs text-gray-400">Reka cerita AU (WhatsApp, Twitter & Simple Text)</p>
       </div>
 
-      <!-- App Mode Switcher (WhatsApp vs Twitter vs Text) -->
+      <!-- App Mode Switcher -->
       <div class="flex bg-gray-900 border border-gray-700 p-1 rounded-lg">
         <button id="btnAppWA" onclick="switchAppMode('wa')" class="px-2.5 py-1.5 rounded-md text-xs font-bold transition bg-emerald-600 text-white flex items-center gap-1" title="WhatsApp Mode">
           <i class="fa-brands fa-whatsapp text-sm"></i> WA
@@ -71,7 +71,7 @@
       </div>
     </div>
 
-    <!-- Sub-Controls Header (Dark/Light & Group Switcher for WA) -->
+    <!-- Sub-Controls Header -->
     <div class="flex justify-between items-center bg-gray-900 border border-gray-800 p-2.5 rounded-xl">
       <span class="text-xs font-semibold text-gray-300" id="currentModeLabel">WhatsApp Mode</span>
       <div class="flex gap-2">
@@ -205,6 +205,9 @@
           <label class="block text-xs text-gray-400 mb-1">Jenis Mesej</label>
           <select id="msgType" onchange="toggleMessageTypeInputs()" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm text-gray-200 outline-none">
             <option value="text">Teks biasa</option>
+            <option value="status_reply">Balas Status WhatsApp 📸</option>
+            <option value="view_once">Photo One View (Belum Buka 🔒)</option>
+            <option value="view_once_opened">Photo One View (Terbuka 🔓)</option>
             <option value="deleted">Mesej Dipadam (Deleted)</option>
             <option value="sticker">Sticker (Dengan Crop)</option>
             <option value="image">Gambar (Dengan Crop)</option>
@@ -214,17 +217,37 @@
           </select>
         </div>
 
+        <!-- Input Teks Biasa -->
         <div id="inputTextContainer">
           <label class="block text-xs text-gray-400 mb-1">Kandungan Mesej</label>
           <textarea id="msgText" rows="2" placeholder="Taip mesej di sini..." class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm outline-none focus:border-emerald-500"></textarea>
         </div>
 
+        <!-- Input Balas Status WhatsApp -->
+        <div id="inputStatusReplyContainer" class="hidden space-y-3 bg-gray-950 p-3 rounded-lg border border-gray-800">
+          <label class="block text-xs font-semibold text-emerald-400">Tetapan Balas Status</label>
+          <div>
+            <label class="block text-[10px] text-gray-400 mb-1">Gambar Status (Upload / Crop)</label>
+            <input type="file" id="statusImgInput" accept="image/*" class="w-full text-xs text-gray-400 bg-gray-900 p-1.5 border border-gray-700 rounded-lg">
+          </div>
+          <div>
+            <label class="block text-[10px] text-gray-400 mb-1">Teks/Caption Status (Opsional)</label>
+            <input type="text" id="statusText" placeholder="cth: Status (1 photo) atau teks story..." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-gray-200 outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] text-gray-400 mb-1">Mesej Balasan Anda</label>
+            <textarea id="statusReplyMsg" rows="2" placeholder="Taip balasan anda pada status ini..." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs outline-none focus:border-emerald-500"></textarea>
+          </div>
+        </div>
+
+        <!-- Input Media (Gambar / Sticker) -->
         <div id="inputMediaContainer" class="hidden">
           <label class="block text-xs text-gray-400 mb-1">Muat Naik Gambar / Sticker</label>
           <input type="file" id="mediaFileInput" accept="image/*" class="w-full text-xs text-gray-400 bg-gray-950 p-2 border border-gray-700 rounded-lg mb-2">
           <input type="text" id="mediaUrlInput" placeholder="Atau URL Gambar..." class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm outline-none">
         </div>
 
+        <!-- Input Voice Note -->
         <div id="inputVoiceContainer" class="hidden space-y-3">
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -241,6 +264,7 @@
           </div>
         </div>
 
+        <!-- Input Call Log -->
         <div id="inputCallContainer" class="hidden space-y-3">
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -261,6 +285,14 @@
           <div>
             <label class="block text-xs text-gray-400 mb-1">Durasi Panggilan (Jika Dijawab)</label>
             <input type="text" id="callDuration" value="15 mins" class="w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm outline-none">
+          </div>
+        </div>
+
+        <!-- React Emoji Chat Option -->
+        <div id="msgReactContainer" class="border-t border-gray-800 pt-3">
+          <label class="block text-xs font-semibold text-emerald-400 mb-1"><i class="fa-regular fa-face-smile"></i> Tambah Reaksi Emoji (React Chat)</label>
+          <div class="flex gap-2">
+            <input type="text" id="msgReaction" placeholder="cth: ❤️, 😂, 👍, 😮 (Biar kosong jika tiada)" class="flex-1 bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm outline-none">
           </div>
         </div>
 
@@ -512,7 +544,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
 
       <div class="pt-3 border-t border-gray-800 flex gap-2">
         <button onclick="exportPNG()" class="flex-1 bg-blue-600 hover:bg-blue-500 py-2 rounded-lg font-bold text-xs text-white flex items-center justify-center gap-1.5">
-          <i class="fa-solid fa-download"></i> Download PNG (Ratio 4:5)
+          <i class="fa-solid fa-download"></i> Download PNG
         </button>
       </div>
     </div>
@@ -646,12 +678,11 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
-    let appMode = 'wa'; // 'wa', 'twitter', 'text'
-    let phoneLayout = 'phone'; // 'phone' or 'simple' (4:5)
-    let phoneTheme = 'dark'; // 'dark' or 'light'
-    let currentMode = 'dm'; // 'dm' or 'group'
+    let appMode = 'wa'; 
+    let phoneLayout = 'phone'; 
+    let phoneTheme = 'dark'; 
+    let currentMode = 'dm'; 
 
-    // Default Group Members with 'Pengguna'
     let groupMembers = [
       { id: '1', name: 'Pengguna', color: '#f59e0b', pfp: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80' }
     ];
@@ -714,7 +745,6 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
       const waSubToggle = document.getElementById('waSubToggle');
       const label = document.getElementById('currentModeLabel');
 
-      // Reset Active Classes
       btnWA.className = "px-2.5 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1";
       btnTwitter.className = "px-2.5 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1";
       btnText.className = "px-2.5 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white flex items-center gap-1";
@@ -749,13 +779,12 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
         waLayoutToggle.classList.add('hidden');
         waSubToggle.classList.add('hidden');
         label.innerText = "Simple Text Mode (4:5)";
-        // Force simple mode for text
         switchPhoneLayout('simple');
         renderSimpleText();
       }
     }
 
-    // Switch Phone Layout (Phone Frame vs Simple 4:5)
+    // Switch Phone Layout
     function switchPhoneLayout(layout) {
       phoneLayout = layout;
       const frame = document.getElementById('phoneFrame');
@@ -881,7 +910,6 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
       textOutput.style.color = simpleTextConfig.color;
       textOutput.className = `text-base leading-relaxed ${fontFamily} ${textAlign}`;
 
-      // Highlight syntax processing (e.g. ==text==)
       let formatted = rawText.replace(/==(.*?)==/g, (match, p1) => {
         let hlBg = simpleTextConfig.highlight === 'transparent' ? highlightCol : simpleTextConfig.highlight;
         return `<span style="background-color: ${hlBg}; padding: 0 4px; border-radius: 4px; font-weight: 600;">${p1}</span>`;
@@ -898,7 +926,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
       }
     }
 
-    // Mode Switching for WA (DM vs Group)
+    // Mode Switching for WA
     function switchChatMode(mode) {
       currentMode = mode;
       const btnDM = document.getElementById('btnModeDM');
@@ -1037,28 +1065,39 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
     function toggleMessageTypeInputs() {
       const type = document.getElementById('msgType').value;
       const textContainer = document.getElementById('inputTextContainer');
+      const statusReplyContainer = document.getElementById('inputStatusReplyContainer');
       const mediaContainer = document.getElementById('inputMediaContainer');
       const voiceContainer = document.getElementById('inputVoiceContainer');
       const callContainer = document.getElementById('inputCallContainer');
 
       textContainer.classList.add('hidden');
+      statusReplyContainer.classList.add('hidden');
       mediaContainer.classList.add('hidden');
       voiceContainer.classList.add('hidden');
       callContainer.classList.add('hidden');
 
-      if (type === 'text' || type === 'divider' || type === 'deleted') textContainer.classList.remove('hidden');
-      else if (type === 'sticker' || type === 'image') mediaContainer.classList.remove('hidden');
-      else if (type === 'voicenote') voiceContainer.classList.remove('hidden');
-      else if (type === 'call') callContainer.classList.remove('hidden');
+      if (type === 'text' || type === 'divider' || type === 'deleted' || type === 'view_once' || type === 'view_once_opened') {
+        textContainer.classList.remove('hidden');
+      } else if (type === 'status_reply') {
+        statusReplyContainer.classList.remove('hidden');
+      } else if (type === 'sticker' || type === 'image') {
+        mediaContainer.classList.remove('hidden');
+      } else if (type === 'voicenote') {
+        voiceContainer.classList.remove('hidden');
+      } else if (type === 'call') {
+        callContainer.classList.remove('hidden');
+      }
     }
 
+    // Add WA Message
     async function addMessage() {
       const sender = document.getElementById('msgSender').value;
       const type = document.getElementById('msgType').value;
       const time = document.getElementById('msgTime').value;
       const status = document.getElementById('msgStatus').value;
+      const reaction = document.getElementById('msgReaction').value.trim();
 
-      let newMsg = { id: Date.now(), sender, type, time, status };
+      let newMsg = { id: Date.now(), sender, type, time, status, reaction };
 
       if (sender === 'left' && currentMode === 'group') {
         newMsg.memberId = document.getElementById('msgGroupMember').value;
@@ -1069,9 +1108,32 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
         if (!newMsg.text) return;
         messages.push(newMsg);
         renderMessages();
-      } else if (type === 'deleted') {
+      } else if (type === 'deleted' || type === 'view_once' || type === 'view_once_opened') {
         messages.push(newMsg);
         renderMessages();
+      } else if (type === 'status_reply') {
+        const fileInput = document.getElementById('statusImgInput');
+        const statusTxt = document.getElementById('statusText').value;
+        const replyTxt = document.getElementById('statusReplyMsg').value;
+
+        newMsg.statusText = statusTxt || 'Status';
+        newMsg.text = replyTxt;
+
+        if (fileInput.files && fileInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            openCropper(e.target.result, (croppedSrc) => {
+              newMsg.statusImg = croppedSrc;
+              messages.push(newMsg);
+              renderMessages();
+            });
+          };
+          reader.readAsDataURL(fileInput.files[0]);
+        } else {
+          newMsg.statusImg = '';
+          messages.push(newMsg);
+          renderMessages();
+        }
       } else if (type === 'voicenote') {
         newMsg.duration = document.getElementById('vnDuration').value;
         newMsg.micStatus = document.getElementById('vnMicStatus').value;
@@ -1313,17 +1375,42 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
           let contentHTML = '';
           if (m.type === 'text') {
             contentHTML = `<p class="text-[12.5px] leading-relaxed break-words">${m.text}</p>`;
+          } else if (m.type === 'view_once') {
+            contentHTML = `
+              <div class="flex items-center gap-2 py-0.5 min-w-[120px]">
+                <div class="w-6 h-6 rounded-full border-2 border-emerald-500 flex items-center justify-center text-emerald-500 font-bold text-[10px]">1</div>
+                <span class="text-[12.5px] font-medium">Photo</span>
+              </div>`;
+          } else if (m.type === 'view_once_opened') {
+            contentHTML = `
+              <div class="flex items-center gap-2 py-0.5 min-w-[120px] text-gray-400">
+                <div class="w-6 h-6 rounded-full border-2 border-gray-400 flex items-center justify-center font-bold text-[10px]">1</div>
+                <span class="text-[12.5px] italic">Opened</span>
+              </div>`;
+          } else if (m.type === 'status_reply') {
+            let imgHTML = m.statusImg ? `<img src="${m.statusImg}" class="w-10 h-10 rounded object-cover">` : '';
+            contentHTML = `
+              <div class="bg-black/20 rounded p-1.5 mb-1.5 border-l-4 border-emerald-500 flex gap-2 items-center">
+                <div class="flex-1 overflow-hidden">
+                  <p class="text-[10px] font-bold text-emerald-400">Status</p>
+                  <p class="text-[11px] truncate opacity-80">${m.statusText || 'Photo'}</p>
+                </div>
+                ${imgHTML}
+              </div>
+              <p class="text-[12.5px] leading-relaxed break-words">${m.text || ''}</p>`;
           } else if (m.type === 'deleted') {
             contentHTML = `<p class="text-[12.5px] leading-relaxed italic text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-ban text-xs"></i> This message was deleted</p>`;
           } else if (m.type === 'image') {
             contentHTML = `<img src="${m.src}" class="rounded-lg max-w-full max-h-48 object-cover mb-1">`;
           } else if (m.type === 'sticker') {
             const avatarMargin = (!isRight && showPfp) ? 'ml-8' : '';
+            let reactBadge = m.reaction ? `<span class="absolute -bottom-2 ${isRight ? 'left-1' : 'right-1'} bg-[#202c33] border border-gray-700 px-1.5 py-0.5 rounded-full text-xs shadow">${m.reaction}</span>` : '';
             chat.innerHTML += `
-              <div class="flex ${isRight ? 'justify-end' : 'justify-start'} my-1">
+              <div class="flex ${isRight ? 'justify-end' : 'justify-start'} my-1 relative">
                 <div class="relative max-w-[130px] ${avatarMargin}">
                   <img src="${m.src}" class="w-28 h-28 object-contain">
                   <span class="text-[9px] text-gray-400 absolute bottom-0 right-0 bg-black/40 px-1 rounded">${m.time}</span>
+                  ${reactBadge}
                 </div>
               </div>`;
             return;
@@ -1357,9 +1444,10 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
 
           let pfpTag = !isRight ? (showPfp ? `<img src="${senderPfpUrl}" class="w-7 h-7 rounded-full object-cover self-end mb-1 mr-1.5 shadow-sm">` : `<div class="w-7 mr-1.5"></div>`) : '';
           let nameTag = (!isRight && currentMode === 'group' && senderName) ? `<p class="text-[11px] font-bold mb-0.5" style="color:${senderColor}">${senderName}</p>` : '';
+          let reactBadge = m.reaction ? `<span class="absolute -bottom-2.5 ${isRight ? 'left-2' : 'right-2'} ${isLight ? 'bg-white border-gray-200' : 'bg-[#202c33] border-gray-700'} border px-1.5 py-0.5 rounded-full text-[11px] shadow-md z-10">${m.reaction}</span>` : '';
 
           chat.innerHTML += `
-            <div class="flex ${isRight ? 'justify-end' : 'justify-start'} my-0.5">
+            <div class="flex ${isRight ? 'justify-end' : 'justify-start'} my-0.5 relative">
               ${!isRight ? pfpTag : ''}
               <div class="${bg} px-2.5 py-1.5 rounded-lg max-w-[78%] shadow-sm relative group">
                 ${nameTag}
@@ -1368,6 +1456,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
                   <span>${m.time}</span>
                   ${ticksHTML}
                 </div>
+                ${reactBadge}
               </div>
             </div>`;
         }
@@ -1375,7 +1464,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
         if (appMode === 'wa') {
           list.innerHTML += `
             <div class="bg-gray-950 p-2 rounded flex justify-between items-center text-xs">
-              <span class="truncate max-w-[200px] text-gray-300">#${idx+1} [${m.type}] ${m.text || m.callType || 'Media/Deleted'}</span>
+              <span class="truncate max-w-[200px] text-gray-300">#${idx+1} [${m.type}] ${m.text || m.statusText || 'ViewOnce/VN'} ${m.reaction ? '('+m.reaction+')' : ''}</span>
               <button onclick="deleteMessage(${m.id})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
             </div>`;
         }
