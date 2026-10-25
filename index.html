@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AU Generator Pro - WhatsApp, X & Simple Text</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<style type="text/tailwindcss">
+@layer components{
+.card{@apply bg-gray-900 border border-gray-800 p-4 rounded-xl space-y-3}
+.inp{@apply w-full bg-gray-950 border border-gray-700 rounded-lg p-2 text-sm outline-none focus:border-emerald-500}
+.lbl{@apply block text-xs text-gray-400 mb-1}
+.ttl{@apply text-sm font-bold text-gray-300 flex items-center gap-2}
+.btn{@apply px-2.5 py-1 rounded-md text-xs font-semibold transition text-gray-400 hover:text-white}
+.on{@apply bg-emerald-600 text-white}
+.go{@apply w-full bg-emerald-600 hover:bg-emerald-500 py-2 rounded-lg font-bold text-white text-sm}
+.grp{@apply flex bg-gray-950 border border-gray-700 p-0.5 rounded-lg}
+.sw{@apply w-6 h-6 rounded-full border border-gray-600}
+.mini{@apply text-xs bg-gray-800 hover:bg-gray-700 text-emerald-400 px-2.5 py-1 rounded-md border border-gray-700 cursor-pointer}
+}
+</style>
+<style>
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#111b21}
+::-webkit-scrollbar-thumb{background:#374248;border-radius:3px}
+#phone{--bar:#111b21;--fg:#e9edef;--sub:#8696a0;--inp:#202c33;--line:#1f2937;--in:#202c33;--out:#005c4b;--pill:#111b21;--sys:#182229;--tw:#000;--tfg:#fff;background:var(--bar)}
+#phone.light{--bar:#f6f6f6;--fg:#111;--sub:#667781;--inp:#fff;--line:#e5e7eb;--in:#fff;--out:#d9fdd3;--pill:#fff;--sys:#fef3c7;--tw:#fff;--tfg:#0f1419}
+#phone.sm{height:auto;aspect-ratio:4/5;max-width:400px;border-radius:16px;border-width:2px}
+#phone.sm .sb{display:none}
+.bar{background:var(--bar);color:var(--fg)}
+.sub{color:var(--sub)}
+.ln{border-color:var(--line)}
+.pb{background:var(--inp);color:var(--sub)}
+.b{background:var(--in);color:var(--fg)}
+.b.r{background:var(--out)}
+.rx{background:var(--in);border-color:var(--line)}
+.pill{background:var(--pill);color:var(--sub);border:1px solid var(--line)}
+.pill.sys{background:var(--sys)}
+.t{font-size:12.5px;line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap}
+.twv{background:var(--tw);color:var(--tfg)}
+#chat.pat{background:#0b141a radial-gradient(#111b21 1px,transparent 0) 0 0/16px 16px}
+#phone.light #chat.pat{background:#efeae2 radial-gradient(#cbd5e1 1px,transparent 0) 0 0/16px 16px}
+#cropBox img{display:block;max-width:100%;max-height:55vh}
+</style>
+</head>
+<body class="bg-gray-950 text-gray-100 font-sans min-h-screen md:flex">
+
+<!-- ========== PANEL KIRI: KAWALAN ========== -->
+<div class="w-full md:w-1/2 lg:w-5/12 p-4 md:p-6 md:h-screen overflow-y-auto border-r border-gray-800 space-y-5">
+
+  <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+    <div>
+      <h1 class="text-xl font-bold text-emerald-400 flex items-center gap-2"><i class="fa-solid fa-mobile-screen"></i> AU Generator Pro</h1>
+      <p class="text-xs text-gray-400">Penyunting WhatsApp, Twitter/X & Simple Text</p>
+    </div>
+    <div class="grp">
+      <button id="btn_wa" class="btn on" onclick="setApp('wa')"><i class="fa-brands fa-whatsapp"></i> WA</button>
+      <button id="btn_twitter" class="btn" onclick="setApp('twitter')"><i class="fa-brands fa-x-twitter"></i> X</button>
+      <button id="btn_text" class="btn" onclick="setApp('text')"><i class="fa-solid fa-align-left"></i> Text</button>
+    </div>
+  </div>
+
+  <div class="flex justify-between items-center bg-gray-900 border border-gray-800 p-2.5 rounded-xl gap-2 flex-wrap">
+    <span class="text-xs font-semibold text-gray-300" id="modeLbl">WhatsApp Mode</span>
+    <div class="flex gap-2">
+      <div id="layBox" class="grp">
+        <button id="btnPhone" class="btn on" onclick="setLayout('phone')"><i class="fa-solid fa-mobile-screen"></i> Phone</button>
+        <button id="btnSimple" class="btn" onclick="setLayout('simple')"><i class="fa-solid fa-expand"></i> 4:5</button>
+      </div>
+      <button onclick="toggleTheme()" aria-label="Tukar tema" class="px-2.5 py-1 rounded-lg border border-gray-700 text-xs bg-gray-950 text-yellow-400 hover:bg-gray-800"><i id="themeIcon" class="fa-solid fa-moon"></i></button>
+      <div id="chatBox" class="grp">
+        <button id="btnDM" class="btn on" onclick="switchChat('dm')" aria-label="Mesej terus"><i class="fa-solid fa-user"></i></button>
+        <button id="btnGroup" class="btn" onclick="switchChat('group')" aria-label="Group"><i class="fa-solid fa-users"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== WHATSAPP ===== -->
+  <div id="waCtl" class="space-y-5">
+    <div class="card">
+      <div class="flex justify-between items-center gap-2">
+        <h2 class="ttl"><i class="fa-solid fa-address-book text-emerald-500"></i> Kontak & Group (<span id="profCount">0/40</span>)</h2>
+        <button onclick="saveProfile()" class="mini">+ Simpan Profil</button>
+      </div>
+      <div id="profList" class="flex gap-2 overflow-x-auto pb-1"></div>
+    </div>
+
+    <div class="card">
+      <div class="flex justify-between items-center gap-2">
+        <h2 class="ttl"><i class="fa-solid fa-note-sticky text-emerald-500"></i> Sticker (<span id="stkCount">0/20</span>)</h2>
+        <label class="mini">Upload (Multi)<input type="file" accept="image/*" multiple class="hidden" onchange="stickerFiles(event)"></label>
+      </div>
+      <div id="stkTray" class="grid grid-cols-5 gap-2 max-h-36 overflow-y-auto p-1.5 bg-gray-950 rounded-lg border border-gray-800"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="ttl"><i class="fa-solid fa-gear text-emerald-500"></i> Tetapan Utama WhatsApp</h2>
+      <div><label class="lbl">Masa Status Bar Telefon</label><input id="barTime" value="10:45" oninput="updateHeader()" class="inp"></div>
+
+      <div class="border-t border-gray-800 pt-3 space-y-2">
+        <label class="lbl text-emerald-400 font-semibold"><i class="fa-solid fa-image"></i> Wallpaper Chat</label>
+        <div class="grid grid-cols-2 gap-2">
+          <select id="wallType" onchange="wall.type=this.value;wallUi()" class="inp text-xs">
+            <option value="pattern">Corak Standard</option><option value="color">Warna Pepejal</option><option value="image">Gambar Tersuai</option>
+          </select>
+          <input type="color" id="wallColor" value="#0b141a" oninput="applyWall()" class="h-9 w-full bg-gray-950 border border-gray-700 rounded-lg cursor-pointer hidden">
+        </div>
+        <input type="file" id="wallFile" accept="image/*" onchange="wallUpload(event)" class="hidden w-full text-xs text-gray-400 bg-gray-950 p-1.5 border border-gray-700 rounded-lg">
+      </div>
+
+      <div id="dmBox" class="space-y-3 border-t border-gray-800 pt-3">
+        <div><label class="lbl">Nama Watak Utama</label><input id="tName" value="Zhn" oninput="updateHeader()" class="inp"></div>
+        <div><label class="lbl">Status Subtitle (online / typing...)</label><input id="tStatus" value="online" oninput="updateHeader()" class="inp"></div>
+        <div><label class="lbl">Gambar Profil (Crop 1:1)</label><input type="file" accept="image/*" onchange="pick(event,'t')" class="inp text-xs"></div>
+      </div>
+
+      <div id="groupBox" class="space-y-3 hidden border-t border-gray-800 pt-3">
+        <div><label class="lbl">Nama Group</label><input id="gName" value="Keluarga AU 🚀" oninput="updateHeader()" class="inp"></div>
+        <div><label class="lbl">Gambar Profil Group (Crop 1:1)</label><input type="file" accept="image/*" onchange="pick(event,'g')" class="inp text-xs"></div>
+        <div class="border-t border-gray-800 pt-3 space-y-2">
+          <label class="lbl text-emerald-400 font-semibold">Ahli Group</label>
+          <div class="flex gap-2">
+            <input id="memName" placeholder="Nama Ahli" class="inp flex-1">
+            <input type="color" id="memColor" value="#34d399" class="h-9 w-10 bg-gray-950 border border-gray-700 rounded-lg cursor-pointer">
+          </div>
+          <input type="file" id="memPfp" accept="image/*" class="inp text-xs">
+          <button onclick="addMember()" class="go">+ Tambah Ahli</button>
+          <div id="membersList" class="flex flex-wrap gap-2 pt-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="ttl"><i class="fa-solid fa-plus text-emerald-500"></i> Tambah Mesej WhatsApp</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="lbl">Pengirim</label>
+          <select id="mSender" onchange="toggleSender()" class="inp">
+            <option value="right">Saya (Kanan)</option><option value="left">Watak (Kiri)</option><option value="system">Notifikasi Sistem</option>
+          </select></div>
+        <div id="boxMember" class="hidden"><label class="lbl">Watak Group</label><select id="msgMember" class="inp"></select></div>
+      </div>
+      <div><label class="lbl">Jenis Mesej</label>
+        <select id="mType" onchange="toggleType()" class="inp">
+          <option value="text">Teks biasa</option>
+          <option value="status_reply">Balas Status WhatsApp 📸</option>
+          <option value="view_once">Photo One View (Belum Buka 🔒)</option>
+          <option value="view_once_opened">Photo One View (Terbuka 🔓)</option>
+          <option value="deleted">Mesej Dipadam</option>
+          <option value="sticker">Sticker (Crop)</option>
+          <option value="image">Gambar (Crop bebas)</option>
+          <option value="voicenote">Voice Note</option>
+          <option value="call">Panggilan (Call Log)</option>
+          <option value="divider">Pembahagi Tarikh</option>
+        </select></div>
+
+      <div id="boxText"><label class="lbl">Kandungan Mesej</label><textarea id="mText" rows="2" placeholder="Taip mesej di sini..." class="inp"></textarea></div>
+
+      <div id="boxStatus" class="hidden space-y-2 bg-gray-950 p-3 rounded-lg border border-gray-800">
+        <label class="lbl text-emerald-400 font-semibold">Tetapan Balas Status</label>
+        <input type="file" id="sImg" accept="image/*" class="inp text-xs">
+        <input id="sText" placeholder="Teks/caption status (opsional)" class="inp text-xs">
+        <textarea id="sReply" rows="2" placeholder="Balasan anda pada status ini..." class="inp text-xs"></textarea>
+      </div>
+
+      <div id="boxMedia" class="hidden space-y-2">
+        <label class="lbl">Muat Naik Gambar / Sticker</label>
+        <input type="file" id="mFile" accept="image/*" class="inp text-xs">
+        <input id="mUrl" placeholder="Atau URL gambar..." class="inp">
+      </div>
+
+      <div id="boxVoice" class="hidden grid grid-cols-2 gap-3">
+        <div><label class="lbl">Durasi (cth 0:15)</label><input id="vnDur" value="0:15" class="inp"></div>
+        <div><label class="lbl">Status Mic</label><select id="vnMic" class="inp"><option value="blue">Biru (Dah Dengar)</option><option value="gray">Kelabu (Belum)</option></select></div>
+      </div>
+
+      <div id="boxCall" class="hidden space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="lbl">Jenis</label><select id="cType" class="inp"><option value="voice">Suara</option><option value="video">Video</option></select></div>
+          <div><label class="lbl">Status</label><select id="cStatus" class="inp"><option value="missed">Terlepas</option><option value="answered">Dijawab</option></select></div>
+        </div>
+        <div><label class="lbl">Durasi (jika dijawab)</label><input id="cDur" value="15 mins" class="inp"></div>
+      </div>
+
+      <div class="border-t border-gray-800 pt-3 space-y-2">
+        <label class="lbl text-emerald-400 font-semibold"><i class="fa-regular fa-face-smile"></i> Reaksi Emoji</label>
+        <div class="flex gap-2"><input id="mReact" placeholder="Pilih emoji di bawah..." class="inp flex-1"><button onclick="$('mReact').value=''" class="px-3 bg-gray-800 hover:bg-gray-700 rounded-lg text-xs text-gray-300">Padam</button></div>
+        <div id="emojis" class="flex flex-wrap gap-1.5 bg-gray-950 p-2 rounded-lg border border-gray-800"></div>
+      </div>
+
+      <div id="boxMeta" class="grid grid-cols-2 gap-3">
+        <div><label class="lbl">Masa</label><input id="mTime" value="10:45 PM" class="inp"></div>
+        <div><label class="lbl">Status Tick (kanan)</label><select id="mStatus" class="inp"><option value="read">Double Tick Biru</option><option value="delivered">Double Tick Kelabu</option><option value="sent">Single Tick</option></select></div>
+      </div>
+      <button onclick="addMsg()" class="go"><i class="fa-solid fa-paper-plane"></i> Tambah Mesej</button>
+    </div>
+  </div>
+
+  <!-- ===== TWITTER / X ===== -->
+  <div id="twitterCtl" class="space-y-5 hidden">
+    <div class="card">
+      <h2 class="ttl text-sky-400"><i class="fa-brands fa-x-twitter"></i> Ciapan Utama</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="lbl">Nama</label><input id="twName" value="Zhn" oninput="renderTw()" class="inp"></div>
+        <div><label class="lbl">Username</label><input id="twHandle" value="zhn_official" oninput="renderTw()" class="inp"></div>
+        <div><label class="lbl">Jenis Akaun</label><select id="twPriv" onchange="renderTw()" class="inp"><option value="public">Public</option><option value="private">Private 🔒</option></select></div>
+        <div><label class="lbl">Lencana</label><select id="twVer" onchange="renderTw()" class="inp"><option value="none">Tiada</option><option value="blue">Blue Verified</option></select></div>
+      </div>
+      <div><label class="lbl">Gambar Profil (Crop 1:1)</label><input type="file" accept="image/*" onchange="pick(event,'tp')" class="inp text-xs"></div>
+      <div><label class="lbl">Teks Ciapan</label><textarea id="twText" rows="3" oninput="renderTw()" class="inp">Adakah korang rasa pilihan aku ini betul? Kadang-kadang fikiran terlampau serabut...</textarea></div>
+      <div><label class="lbl">Gambar Lampiran (opsional)</label><input type="file" accept="image/*" onchange="pick(event,'tm')" class="inp text-xs"></div>
+      <div><label class="lbl">Tarikh & Masa</label><input id="twTime" value="10:45 PM · Oct 24, 2026" oninput="renderTw()" class="inp"></div>
+      <div id="twMetrics" class="border-t border-gray-800 pt-3 grid grid-cols-4 gap-2">
+        <div><label class="lbl">Retweets</label><input id="twRt" value="1,240" oninput="renderTw()" class="inp text-xs p-1"></div>
+        <div><label class="lbl">Quotes</label><input id="twQt" value="342" oninput="renderTw()" class="inp text-xs p-1"></div>
+        <div><label class="lbl">Likes</label><input id="twLk" value="8,920" oninput="renderTw()" class="inp text-xs p-1"></div>
+        <div><label class="lbl">Views</label><input id="twVw" value="125K" oninput="renderTw()" class="inp text-xs p-1"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="ttl text-sky-400"><i class="fa-solid fa-comment"></i> Tambah Komen</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <input id="rName" placeholder="Nama" class="inp"><input id="rHandle" placeholder="handle" class="inp">
+      </div>
+      <input type="file" id="rPfp" accept="image/*" class="inp text-xs">
+      <textarea id="rText" rows="2" placeholder="Taip komen..." class="inp"></textarea>
+      <label class="flex items-center gap-2 text-xs text-gray-300"><input type="checkbox" id="rPin"> 📌 Semat komen ini</label>
+      <button onclick="addReply()" class="go !bg-sky-600 hover:!bg-sky-500">+ Tambah Komen</button>
+    </div>
+  </div>
+
+  <!-- ===== SIMPLE TEXT ===== -->
+  <div id="textCtl" class="space-y-5 hidden">
+    <div class="card">
+      <h2 class="ttl text-amber-400"><i class="fa-solid fa-align-left"></i> Simple Text (4:5)</h2>
+      <textarea id="stContent" rows="6" oninput="renderText()" class="inp leading-relaxed">"Kadang-kadang, kita bukan mencari jawapan yang betul...
+Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
+      <div class="space-y-2"><label class="lbl">Warna Background</label>
+        <div class="flex items-center gap-2"><input type="color" id="stBg" value="#0f172a" oninput="setBg(this.value)" class="h-9 w-12 bg-gray-950 border border-gray-700 rounded-lg cursor-pointer"><div id="bgPal" class="flex flex-wrap gap-1.5"></div></div></div>
+      <div class="space-y-2 border-t border-gray-800 pt-3"><label class="lbl">Warna Teks</label>
+        <div class="flex items-center gap-2"><input type="color" id="stColor" value="#f8fafc" oninput="setCol(this.value)" class="h-9 w-12 bg-gray-950 border border-gray-700 rounded-lg cursor-pointer"><div id="colPal" class="flex flex-wrap gap-1.5"></div></div></div>
+      <div class="space-y-2 border-t border-gray-800 pt-3"><label class="lbl">Highlight (guna <code class="text-amber-400">==perkataan==</code>)</label>
+        <div class="flex items-center gap-2"><input type="color" id="stHl" value="#fde047" oninput="setHl(this.value)" class="h-9 w-12 bg-gray-950 border border-gray-700 rounded-lg cursor-pointer"><div id="hlPal" class="flex flex-wrap gap-1.5"></div></div></div>
+      <div class="grid grid-cols-2 gap-3 border-t border-gray-800 pt-3">
+        <div><label class="lbl">Gaya Font</label><select id="stFont" onchange="renderText()" class="inp text-xs"><option value="font-sans">Moden Sans</option><option value="font-serif">Klasik Serif</option><option value="font-mono">Monospace</option></select></div>
+        <div><label class="lbl">Jajaran</label><select id="stAlign" onchange="renderText()" class="inp text-xs"><option value="text-left">Kiri</option><option value="text-center" selected>Tengah</option><option value="text-right">Kanan</option></select></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SENARAI & EKSPORT ===== -->
+  <div class="card">
+    <div class="flex justify-between items-center"><h2 class="ttl">Senarai Item</h2><button onclick="clearAll()" class="text-xs text-red-400 hover:underline">Padam Semua</button></div>
+    <div id="itemList" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+    <button onclick="exportPNG()" class="go !bg-blue-600 hover:!bg-blue-500 !text-xs"><i class="fa-solid fa-download"></i> Download PNG</button>
+  </div>
+</div>
+
+<!-- ========== PANEL KANAN: PREVIEW ========== -->
+<div class="w-full md:w-1/2 lg:w-7/12 bg-gray-950 p-4 flex items-center justify-center md:h-screen md:sticky md:top-0 overflow-y-auto">
+  <div id="phone" class="w-full max-w-[380px] h-[720px] rounded-[30px] border-4 border-gray-800 shadow-2xl flex flex-col overflow-hidden relative transition-all duration-300">
+
+    <div class="sb bar sub px-6 pt-3 pb-2 flex justify-between items-center text-xs select-none">
+      <span id="clock">10:45</span>
+      <div class="flex gap-1.5"><i class="fa-solid fa-signal"></i><i class="fa-solid fa-wifi"></i><i class="fa-solid fa-battery-full text-emerald-400"></i></div>
+    </div>
+
+    <!-- WhatsApp -->
+    <div id="waView" class="flex-1 min-h-0 flex flex-col">
+      <div class="bar ln border-b px-3 py-2 flex items-center justify-between select-none">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-arrow-left text-sm"></i>
+          <img id="hPfp" class="w-9 h-9 rounded-full object-cover" alt="">
+          <div><h3 id="hTitle" class="text-sm font-semibold leading-tight"></h3><p id="hSub" class="sub text-[11px] leading-tight"></p></div>
+        </div>
+        <div class="flex items-center gap-4 text-sm pr-2"><i class="fa-solid fa-video"></i><i class="fa-solid fa-phone"></i><i class="fa-solid fa-ellipsis-vertical"></i></div>
+      </div>
+      <div id="chat" class="pat flex-1 min-h-0 p-3 overflow-y-auto space-y-2.5"></div>
+      <div class="bar px-3 py-2 flex items-center gap-2 select-none">
+        <div class="pb flex-1 rounded-full px-3 py-1.5 flex items-center gap-2 text-xs"><i class="fa-regular fa-face-smile text-base"></i><span class="flex-1">Message</span><i class="fa-solid fa-paperclip text-sm"></i><i class="fa-solid fa-camera text-sm"></i></div>
+        <div class="w-8 h-8 rounded-full bg-[#00a884] flex items-center justify-center text-white text-xs"><i class="fa-solid fa-microphone"></i></div>
+      </div>
+    </div>
+
+    <!-- Twitter / X -->
+    <div id="twitterView" class="twv hidden flex flex-col flex-1 min-h-0 overflow-y-auto">
+      <div class="ln border-b px-4 py-2.5 flex items-center justify-between text-sm"><i class="fa-solid fa-arrow-left"></i><span class="font-bold">Post</span><i class="fa-solid fa-ellipsis"></i></div>
+      <div class="ln border-b p-4 space-y-3">
+        <div class="flex items-center gap-3">
+          <img id="pPfp" class="w-10 h-10 rounded-full object-cover" alt="">
+          <div>
+            <div class="flex items-center gap-1"><span id="pName" class="font-bold text-sm"></span><i id="pLock" class="fa-solid fa-lock text-xs hidden"></i><i id="pBadge" class="fa-solid fa-circle-check text-xs text-sky-400 hidden"></i></div>
+            <p id="pHandle" class="sub text-xs"></p>
+          </div>
+        </div>
+        <p id="pText" class="text-sm leading-relaxed whitespace-pre-line"></p>
+        <img id="pMedia" class="rounded-2xl max-w-full max-h-60 object-cover hidden border ln" alt="">
+        <p id="pTime" class="sub text-xs pt-1"></p>
+        <div id="pMetrics" class="sub ln border-t border-b flex flex-wrap gap-x-4 gap-y-1 text-xs py-2">
+          <div><b id="cRt"></b> Retweets</div><div><b id="cQt"></b> Quotes</div><div><b id="cLk"></b> Likes</div><div><b id="cVw"></b> Views</div>
+        </div>
+        <div id="pBanner" class="hidden text-xs text-sky-400 py-1 items-center gap-1.5"><i class="fa-solid fa-user-lock"></i> Who can reply? Only mentioned accounts or owner.</div>
+      </div>
+      <div id="replies" class="flex-1"></div>
+    </div>
+
+    <!-- Simple Text -->
+    <div id="textView" class="hidden flex flex-col flex-1 items-center justify-center p-8">
+      <div class="w-full max-w-sm"><p id="stOut" class="text-base leading-relaxed"></p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL CROP ========== -->
+<div id="cropModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 max-w-md w-full space-y-4">
+    <h3 class="text-sm font-bold text-gray-200 flex items-center gap-2"><i class="fa-solid fa-crop text-emerald-500"></i> Potong Gambar</h3>
+    <div id="cropBox" class="overflow-hidden bg-black rounded-lg"><img id="cropImg" alt=""></div>
+    <div class="flex justify-end gap-2">
+      <button onclick="closeCrop(true)" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:bg-gray-800">Batal</button>
+      <button onclick="doCrop()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-500">Potong & Gunakan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=i=>document.getElementById(i);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const IMG='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80';
+const IMG2='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80';
+const IMG3='https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=100&q=80';
+let app='wa',lay='phone',theme='dark',chat='dm',msgs=[],stickers=[],profiles=[],db=null,cropper=null,cropCb=null,q=[];
+let members=[{id:'1',name:'Pengguna',color:'#f59e0b',pfp:IMG2}];
+let tgt={name:'Zhn',status:'online',pfp:IMG},grp={name:'Keluarga AU 🚀',pfp:IMG3};
+let wall={type:'pattern',image:''},tw={pfp:IMG,media:'',replies:[]},st={bg:'#0f172a',color:'#f8fafc',hl:'#fde047'};
+const readFile=(f,cb)=>{const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(f)};
+
+/* ---------- IndexedDB (sticker & profil) ---------- */
+const idb=(store,mode,fn)=>new Promise((res,rej)=>{if(!db)return rej('nodb');const t=db.transaction(store,mode),r=fn(t.objectStore(store));t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error)});
+function initDB(){
+  try{const r=indexedDB.open('AUGenDB',2);
+  r.onupgradeneeded=e=>{const d=e.target.result;['stickers','profiles'].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'})})};
+  r.onsuccess=e=>{db=e.target.result;loadLists()};r.onerror=()=>loadLists()}catch(e){loadLists()}
+}
+async function loadLists(){
+  try{stickers=(await idb('stickers','readonly',s=>s.getAll()))||[];profiles=(await idb('profiles','readonly',s=>s.getAll()))||[]}catch(e){}
+  renderStickers();renderProfiles();
+}
+
+/* ---------- Crop ---------- */
+function crop(src,ok,cancel,free){
+  $('cropImg').src=src;$('cropModal').classList.remove('hidden');
+  if(cropper)cropper.destroy();
+  cropper=new Cropper($('cropImg'),{aspectRatio:free?NaN:1,viewMode:1});
+  cropCb={ok,cancel,free};
+}
+function closeCrop(cancelled){
+  $('cropModal').classList.add('hidden');
+  if(cropper){cropper.destroy();cropper=null}
+  const c=cropCb;cropCb=null;
+  if(cancelled&&c&&c.cancel)c.cancel();
+}
+function doCrop(){
+  if(!cropper||!cropCb)return;
+  const free=cropCb.free,ok=cropCb.ok;
+  const cv=cropper.getCroppedCanvas(free?{maxWidth:800,maxHeight:800}:{width:400,height:400});
+  closeCrop(false);
+  if(cv)ok(cv.toDataURL('image/png'));
+}
+function pick(e,t){
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  readFile(f,src=>crop(src,c=>{
+    if(t==='t')tgt.pfp=c;else if(t==='g')grp.pfp=c;else if(t==='tp')tw.pfp=c;else tw.media=c;
+    updateHeader();renderTw();
+  }));
+}
+
+/* ---------- Sticker ---------- */
+function stickerFiles(e){q=[...e.target.files];e.target.value='';nextSticker()}
+function nextSticker(){
+  const f=q.shift();if(!f)return;
+  readFile(f,src=>crop(src,async c=>{if(await addSticker(c))nextSticker();else q=[]},()=>nextSticker()));
+}
+async function addSticker(src){
+  if(stickers.length>=20){alert('Had maksimum 20 sticker tercapai. Sila padam sticker sedia ada.');return false}
+  const o={id:'stk_'+Date.now()+Math.random().toString(36).slice(2,6),src};
+  stickers.push(o);try{await idb('stickers','readwrite',s=>s.put(o))}catch(e){}
+  renderStickers();return true;
+}
+async function delSticker(id){
+  stickers=stickers.filter(s=>s.id!==id);try{await idb('stickers','readwrite',s=>s.delete(id))}catch(e){}
+  renderStickers();
+}
+function renderStickers(){
+  $('stkCount').textContent=stickers.length+'/20';
+  $('stkTray').innerHTML=stickers.map(s=>`<div class="relative group border border-gray-800 rounded p-1 bg-gray-900"><img src="${s.src}" data-id="${esc(s.id)}" class="w-full h-12 object-contain cursor-pointer" alt="sticker"><button data-del="${esc(s.id)}" class="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 text-[9px] opacity-0 group-hover:opacity-100" aria-label="Padam sticker">✕</button></div>`).join('');
+}
+$('stkTray').onclick=e=>{const d=e.target.dataset;if(d.del)delSticker(d.del);else if(d.id)quickSticker(d.id)};
+function quickSticker(id){
+  const s=stickers.find(x=>x.id===id);if(!s)return;
+  const m={id:Date.now(),sender:$('mSender').value,type:'sticker',src:s.src,time:$('mTime').value,status:$('mStatus').value,reaction:$('mReact').value.trim()};
+  if(m.sender==='system')m.sender='right';
+  if(m.sender==='left'&&chat==='group')m.memberId=$('msgMember').value;
+  msgs.push(m);renderMessages();
+}
+
+/* ---------- Profil tersimpan ---------- */
+async function saveProfile(){
+  if(profiles.length>=40)return alert('Had maksimum 40 profil disimpan!');
+  const dm=chat==='dm';
+  const p={id:'prof_'+Date.now(),mode:chat,title:dm?tgt.name:grp.name,subtitle:dm?tgt.status:'',pfp:dm?tgt.pfp:grp.pfp,members:dm?[]:members.map(m=>({...m}))};
+  profiles.push(p);try{await idb('profiles','readwrite',s=>s.put(p))}catch(e){}
+  renderProfiles();
+}
+function renderProfiles(){
+  $('profCount').textContent=profiles.length+'/40';
+  $('profList').innerHTML=profiles.map(p=>`<div class="shrink-0 bg-gray-950 border border-gray-800 rounded-lg p-1.5 flex items-center gap-2"><img src="${esc(p.pfp)}" class="w-6 h-6 rounded-full object-cover" alt=""><span data-use="${esc(p.id)}" class="text-xs cursor-pointer text-gray-300 font-semibold truncate max-w-[80px]">${esc(p.title)}</span><button data-pdel="${esc(p.id)}" class="text-red-400 text-xs hover:text-red-300" aria-label="Padam profil">✕</button></div>`).join('');
+}
+$('profList').onclick=e=>{const d=e.target.dataset;if(d.use)useProfile(d.use);else if(d.pdel)delProfile(d.pdel)};
+function useProfile(id){
+  const p=profiles.find(x=>x.id===id);if(!p)return;
+  switchChat(p.mode);
+  if(p.mode==='dm'){tgt.pfp=p.pfp;$('tName').value=p.title;$('tStatus').value=p.subtitle}
+  else{grp.pfp=p.pfp;$('gName').value=p.title;members=(p.members||[]).map(m=>({...m}));renderMembers()}
+  updateHeader();renderMessages();
+}
+async function delProfile(id){
+  profiles=profiles.filter(p=>p.id!==id);try{await idb('profiles','readwrite',s=>s.delete(id))}catch(e){}
+  renderProfiles();
+}
+
+/* ---------- Mod, susun atur, tema ---------- */
+function setApp(m){
+  app=m;
+  ['wa','twitter','text'].forEach(k=>{
+    $('btn_'+k).classList.toggle('on',k===m);
+    $(k+'Ctl').classList.toggle('hidden',k!==m);
+    $(k+'View').classList.toggle('hidden',k!==m);
+  });
+  $('layBox').classList.toggle('hidden',m==='text');
+  $('chatBox').classList.toggle('hidden',m!=='wa');
+  $('modeLbl').textContent={wa:'WhatsApp Mode',twitter:'Twitter / X Mode',text:'Simple Text Mode (4:5)'}[m];
+  applyLayout();render();
+}
+function setLayout(l){lay=l;applyLayout()}
+function applyLayout(){
+  $('phone').classList.toggle('sm',lay==='simple'||app==='text');
+  $('btnPhone').classList.toggle('on',lay==='phone');
+  $('btnSimple').classList.toggle('on',lay==='simple');
+}
+function toggleTheme(){
+  theme=theme==='dark'?'light':'dark';
+  $('phone').classList.toggle('light',theme==='light');
+  $('themeIcon').className=theme==='light'?'fa-solid fa-sun':'fa-solid fa-moon';
+  applyWall();render();
+}
+function render(){if(app==='wa')renderMessages();else if(app==='twitter')renderTw();else renderText()}
+function switchChat(mode){
+  chat=mode;
+  $('btnDM').classList.toggle('on',mode==='dm');
+  $('btnGroup').classList.toggle('on',mode==='group');
+  $('dmBox').classList.toggle('hidden',mode!=='dm');
+  $('groupBox').classList.toggle('hidden',mode!=='group');
+  toggleSender();updateHeader();renderMessages();
+}
+function updateHeader(){
+  $('clock').textContent=$('barTime').value||'10:45';
+  if(chat==='dm'){
+    tgt.name=$('tName').value;tgt.status=$('tStatus').value;
+    $('hPfp').src=tgt.pfp;$('hTitle').textContent=tgt.name;$('hSub').textContent=tgt.status;
+  }else{
+    grp.name=$('gName').value;
+    $('hPfp').src=grp.pfp;$('hTitle').textContent=grp.name;
+    $('hSub').textContent=members.map(m=>m.name).join(', ')||'Tiada ahli';
+  }
+}
+
+/* ---------- Wallpaper ---------- */
+function wallUi(){
+  $('wallColor').classList.toggle('hidden',wall.type!=='color');
+  $('wallFile').classList.toggle('hidden',wall.type!=='image');
+  applyWall();
+}
+function applyWall(){
+  const c=$('chat');c.style.background='';
+  c.classList.toggle('pat',wall.type==='pattern'||(wall.type==='image'&&!wall.image));
+  if(wall.type==='color')c.style.background=$('wallColor').value;
+  else if(wall.type==='image'&&wall.image)c.style.background=`url("${wall.image}") center/cover`;
+}
+function wallUpload(e){const f=e.target.files[0];if(f)readFile(f,s=>{wall.image=s;applyWall()})}
+
+/* ---------- Ahli group ---------- */
+function addMember(){
+  const name=$('memName').value.trim();if(!name)return;
+  const f=$('memPfp').files[0];
+  const save=pfp=>{
+    members.push({id:Date.now().toString(),name,color:$('memColor').value,pfp:pfp||IMG2});
+    $('memName').value='';$('memPfp').value='';renderMembers();updateHeader();
+  };
+  f?readFile(f,s=>crop(s,save)):save();
+}
+function rmMember(id){members=members.filter(m=>m.id!==id);renderMembers();updateHeader();renderMessages()}
+function renderMembers(){
+  $('membersList').innerHTML=members.map(m=>`<span class="text-xs px-2 py-1 rounded flex items-center gap-1.5 text-black font-semibold" style="background:${esc(m.color)}">${esc(m.name)} <i class="fa-solid fa-xmark cursor-pointer" onclick="rmMember('${m.id}')"></i></span>`).join('');
+  const sel=$('msgMember'),cur=sel.value;
+  sel.innerHTML=members.map(m=>`<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('');
+  if(members.some(m=>m.id===cur))sel.value=cur;
+}
+
+/* ---------- Borang mesej ---------- */
+function toggleSender(){
+  const s=$('mSender').value;
+  $('boxMember').classList.toggle('hidden',!(s==='left'&&chat==='group'));
+  $('boxMeta').classList.toggle('hidden',s==='system');
+  toggleType();
+}
+function toggleType(){
+  const t=$('mType').value,sys=$('mSender').value==='system'&&t!=='divider',tt=sys?'text':t;
+  const show=(id,v)=>$(id).classList.toggle('hidden',!v);
+  show('boxText',tt==='text'||tt==='divider');show('boxStatus',tt==='status_reply');
+  show('boxMedia',tt==='sticker'||tt==='image');show('boxVoice',tt==='voicenote');show('boxCall',tt==='call');
+}
+function addMsg(){
+  const sender=$('mSender').value;let type=$('mType').value;
+  if(sender==='system'&&type!=='divider')type='text';
+  const m={id:Date.now(),sender,type,time:$('mTime').value,status:$('mStatus').value,reaction:$('mReact').value.trim()};
+  if(sender==='left'&&chat==='group')m.memberId=$('msgMember').value;
+  const done=()=>{msgs.push(m);$('mText').value='';$('mReact').value='';renderMessages()};
+  if(type==='text'||type==='divider'){m.text=$('mText').value;if(!m.text)return;done()}
+  else if(type==='status_reply'){
+    m.statusText=$('sText').value||'Status';m.text=$('sReply').value;
+    const f=$('sImg').files[0];
+    if(f)readFile(f,s=>crop(s,c=>{m.statusImg=c;$('sImg').value='';done()}));else done();
+  }
+  else if(type==='voicenote'){m.duration=$('vnDur').value;m.mic=$('vnMic').value;done()}
+  else if(type==='call'){m.callType=$('cType').value;m.callStatus=$('cStatus').value;m.callDur=$('cDur').value;done()}
+  else if(type==='sticker'||type==='image'){
+    const f=$('mFile').files[0],u=$('mUrl').value.trim();
+    if(f)readFile(f,s=>crop(s,c=>{m.src=c;$('mFile').value='';done()},null,type==='image'));
+    else if(u){m.src=u;$('mUrl').value='';done()}
+  }
+  else done();
+}
+function delMsg(id){msgs=msgs.filter(m=>m.id!==id);renderMessages()}
+
+/* ---------- Render WhatsApp ---------- */
+function renderMessages(){
+  const c=$('chat');let h='',last=null;
+  msgs.forEach(m=>{
+    const R=m.sender==='right',T=m.type;
+    if(m.sender==='system'||T==='divider'){
+      const sys=m.sender==='system'&&T!=='divider';
+      h+=`<div class="flex justify-center my-1.5"><span class="pill ${sys?'sys':''} text-[10.5px] px-3 py-1 rounded-lg text-center shadow-sm max-w-[85%]">${esc(m.text)}</span></div>`;
+      last=null;return;
+    }
+    let show=false,pfp='',name='',col='#34d399';
+    if(!R){
+      let key;
+      if(chat==='group'){const mem=members.find(g=>g.id===m.memberId);key=m.memberId||'x';pfp=mem?mem.pfp:IMG2;name=mem?mem.name:'';col=mem?mem.color:col}
+      else{key='t';pfp=tgt.pfp}
+      if(last!==key){show=true;last=key}
+    }else last=null;
+    const av=!R?(show?`<img src="${esc(pfp)}" class="w-7 h-7 rounded-full object-cover self-end mb-1 mr-1.5 shrink-0" alt="">`:'<div class="w-7 mr-1.5 shrink-0"></div>'):'';
+    const re=m.reaction?`<span class="rx absolute -bottom-2.5 ${R?'left-2':'right-2'} border px-1.5 py-0.5 rounded-full text-[11px] shadow-md z-10">${esc(m.reaction)}</span>`:'';
+    const ticks=R&&T!=='deleted'?(m.status==='read'?'<i class="fa-solid fa-check-double text-sky-400 text-[10px]"></i>':m.status==='delivered'?'<i class="fa-solid fa-check-double text-gray-400 text-[10px]"></i>':'<i class="fa-solid fa-check text-gray-400 text-[10px]"></i>'):'';
+    if(T==='sticker'){
+      h+=`<div class="flex ${R?'justify-end':'justify-start'} my-1">${av}<div class="relative"><img src="${esc(m.src)}" class="w-28 h-28 object-contain" alt=""><span class="text-[9px] text-gray-300 absolute bottom-0 right-0 bg-black/40 px-1 rounded">${esc(m.time)}</span>${re}</div></div>`;
+      return;
+    }
+    let body='',meta=true;
+    if(T==='text')body=`<p class="t">${esc(m.text)}</p>`;
+    else if(T==='view_once'||T==='view_once_opened'){
+      const o=T==='view_once_opened';
+      body=`<div class="flex items-center gap-2 py-0.5 min-w-[120px] ${o?'text-gray-400':'text-emerald-500'}"><div class="w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-[10px]">1</div><span class="text-[12.5px] ${o?'italic font-medium':'font-semibold'}">${o?'Opened':'Photo'}</span></div>`;
+    }
+    else if(T==='status_reply')body=`<div class="bg-black/20 rounded p-1.5 mb-1.5 border-l-4 border-emerald-500 flex gap-2 items-center"><div class="flex-1 overflow-hidden"><p class="text-[10px] font-bold text-emerald-400">Status</p><p class="text-[11px] truncate opacity-80">${esc(m.statusText||'Photo')}</p></div>${m.statusImg?`<img src="${m.statusImg}" class="w-10 h-10 rounded object-cover" alt="">`:''}</div><p class="t">${esc(m.text)}</p>`;
+    else if(T==='deleted'){body='<p class="t italic opacity-70"><i class="fa-solid fa-ban text-xs mr-1"></i>This message was deleted</p>';meta=false}
+    else if(T==='image')body=`<img src="${esc(m.src)}" class="rounded-lg max-w-full max-h-48 object-cover mb-1" alt="">`;
+    else if(T==='voicenote'){
+      const bl=m.mic==='blue';
+      body=`<div class="flex items-center gap-2.5 min-w-[180px] py-1"><i class="fa-solid fa-play text-xs"></i><div class="flex-1"><div class="flex items-center gap-[2px] h-5 ${bl?'text-sky-400':'sub'}">${Array.from({length:24},(_,i)=>`<i class="inline-block w-[3px] rounded bg-current" style="height:${4+((i*7+m.id%13)*5)%14}px"></i>`).join('')}</div><span class="sub text-[10px]">${esc(m.duration||'0:15')}</span></div><i class="fa-solid fa-microphone ${bl?'text-sky-400':'text-gray-400'} text-base"></i></div>`;
+    }
+    else if(T==='call'){
+      const ms=m.callStatus==='missed',vd=m.callType==='video';
+      body=`<div class="flex items-center gap-3 min-w-[170px] py-1"><div class="w-8 h-8 rounded-full bg-gray-500/30 flex items-center justify-center"><i class="fa-solid ${vd?'fa-video':'fa-phone'} ${ms?'text-red-500':'text-emerald-500'} text-xs"></i></div><div><p class="text-[12px] font-semibold leading-tight">${ms?`Missed ${vd?'video':'voice'} call`:`${vd?'Video':'Voice'} call (${esc(m.callDur)})`}</p><p class="sub text-[10px]">${ms?'Tap to call back':'Ended'}</p></div></div>`;
+    }
+    const nm=(!R&&chat==='group'&&name)?`<p class="text-[11px] font-bold mb-0.5" style="color:${esc(col)}">${esc(name)}</p>`:'';
+    const mt=meta?`<div class="flex items-center justify-end gap-1 text-[9.5px] opacity-70 -mb-0.5 mt-0.5"><span>${esc(m.time)}</span>${ticks}</div>`:'';
+    h+=`<div class="flex ${R?'justify-end':'justify-start'} my-0.5">${av}<div class="b ${R?'r':''} px-2.5 py-1.5 rounded-lg max-w-[78%] shadow-sm relative">${nm}${body}${mt}${re}</div></div>`;
+  });
+  c.innerHTML=h;c.scrollTop=c.scrollHeight;renderList();
+}
+
+/* ---------- Render Twitter / X ---------- */
+function renderTw(){
+  const priv=$('twPriv').value==='private',h=$('twHandle').value;
+  $('pName').textContent=$('twName').value;
+  $('pHandle').textContent=h.startsWith('@')?h:'@'+h;
+  $('pText').textContent=$('twText').value;
+  $('pTime').textContent=$('twTime').value;
+  $('pPfp').src=tw.pfp;
+  $('pLock').classList.toggle('hidden',!priv);
+  $('pMetrics').classList.toggle('hidden',priv);
+  $('pBanner').classList.toggle('hidden',!priv);
+  $('pBanner').classList.toggle('flex',priv);
+  $('twMetrics').classList.toggle('hidden',priv);
+  $('pBadge').classList.toggle('hidden',$('twVer').value!=='blue');
+  [['cRt','twRt'],['cQt','twQt'],['cLk','twLk'],['cVw','twVw']].forEach(([a,b])=>$(a).textContent=$(b).value);
+  const mi=$('pMedia');mi.classList.toggle('hidden',!tw.media);if(tw.media)mi.src=tw.media;
+  $('replies').innerHTML=tw.replies.map(r=>`<div class="ln border-b p-3 flex gap-3"><img src="${esc(r.pfp)}" class="w-8 h-8 rounded-full object-cover" alt=""><div class="flex-1">${r.pinned?'<p class="sub text-[10px] mb-1 font-semibold"><i class="fa-solid fa-thumbtack text-sky-400"></i> Pinned</p>':''}<div class="flex items-center gap-1.5"><span class="font-bold text-xs">${esc(r.name)}</span><span class="sub text-xs">${esc(r.handle)}</span></div><p class="text-xs leading-normal mt-0.5 whitespace-pre-line">${esc(r.text)}</p></div></div>`).join('');
+  renderList();
+}
+function addReply(){
+  const text=$('rText').value;if(!text)return;
+  const f=$('rPfp').files[0];
+  const go=p=>{
+    const r={id:Date.now(),name:$('rName').value||'Anonym',handle:'@'+($('rHandle').value||'user').replace(/^@/,''),text,pinned:$('rPin').checked,pfp:p||IMG2};
+    r.pinned?tw.replies.unshift(r):tw.replies.push(r);
+    $('rText').value='';$('rPin').checked=false;$('rPfp').value='';renderTw();
+  };
+  f?readFile(f,s=>crop(s,go)):go();
+}
+function delReply(id){tw.replies=tw.replies.filter(r=>r.id!==id);renderTw()}
+
+/* ---------- Simple Text ---------- */
+const pal=(id,cols,fn)=>{$(id).innerHTML=cols.map(c=>`<button class="sw" style="background:${c}" onclick="${fn}('${c}')" title="${c==='transparent'?'Tiada':c}" aria-label="${c}"></button>`).join('')};
+function setBg(c){st.bg=c;$('stBg').value=c;renderText()}
+function setCol(c){st.color=c;$('stColor').value=c;renderText()}
+function setHl(c){st.hl=c;if(c!=='transparent')$('stHl').value=c;renderText()}
+function renderText(){
+  $('textView').style.background=st.bg;
+  const o=$('stOut');o.style.color=st.color;
+  o.className=`text-base leading-relaxed whitespace-pre-wrap ${$('stFont').value} ${$('stAlign').value}`;
+  o.innerHTML=esc($('stContent').value).replace(/==(.*?)==/g,(_,p)=>`<span style="background:${st.hl};padding:0 4px;border-radius:4px;font-weight:600">${p}</span>`);
+  renderList();
+}
+
+/* ---------- Senarai, padam, eksport ---------- */
+const item=(t,del)=>`<div class="bg-gray-950 p-2 rounded flex justify-between items-center text-xs"><span class="truncate max-w-[250px] text-gray-300">${esc(t)}</span>${del?`<button onclick="${del}" class="text-red-400 hover:text-red-300" aria-label="Padam"><i class="fa-solid fa-trash"></i></button>`:''}</div>`;
+function renderList(){
+  let h='';
+  if(app==='wa')msgs.forEach((m,i)=>h+=item(`#${i+1} [${m.type}] ${m.text||m.statusText||'(media)'}${m.reaction?' ('+m.reaction+')':''}`,`delMsg(${m.id})`));
+  else if(app==='twitter')tw.replies.forEach((r,i)=>h+=item(`#${i+1} [Reply] ${r.name}: ${r.text}`,`delReply(${r.id})`));
+  else h=item('[Simple Text] '+$('stContent').value.slice(0,30)+'…');
+  $('itemList').innerHTML=h;
+}
+function clearAll(){
+  if(app==='wa')msgs=[];else if(app==='twitter')tw.replies=[];else $('stContent').value='';
+  render();
+}
+function exportPNG(){
+  html2canvas($('phone'),{scale:2,useCORS:true,backgroundColor:null}).then(cv=>{
+    const a=document.createElement('a');a.download=`AU_Generator_${app.toUpperCase()}_${Date.now()}.png`;a.href=cv.toDataURL();a.click();
+  }).catch(()=>alert('Eksport gagal. Gambar dari URL luar mungkin disekat (CORS); gunakan muat naik fail.'));
+}
+
+/* ---------- Mula ---------- */
+$('emojis').innerHTML=['❤️','😂','👍','🔥','😭','🥺','💀','✨','😊','🙏','😮','😡'].map(e=>`<button onclick="$('mReact').value='${e}'" class="w-8 h-8 hover:bg-gray-800 rounded text-sm">${e}</button>`).join('');
+pal('bgPal',['#0f172a','#1e293b','#f8fafc','#fdf2f8','#fef3c7','#f1f5f9','#ecfdf5','#e0f2fe','#27272a'],'setBg');
+pal('colPal',['#f8fafc','#334155','#0f172a','#e11d48','#d97706','#059669','#0284c7','#9333ea'],'setCol');
+pal('hlPal',['#fde047','#fbcfe8','#bfdbfe','#bbf7d0','#fed7aa','transparent'],'setHl');
+renderMembers();applyWall();updateHeader();toggleSender();setApp('wa');renderTw();renderText();initDB();
+</script>
+</body>
+</html>
