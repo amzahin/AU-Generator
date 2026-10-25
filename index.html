@@ -1,4 +1,28 @@
+index.html (AU Generator Pro - Kemas Kini Penuh)
 <!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AU Generator Pro - WhatsApp, X & Simple Text</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #111b21; }
+    ::-webkit-scrollbar-thumb { background: #374248; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4a555c; }
+    .wa-bg-dark { background-color: #0b141a; background-image: radial-gradient(#111b21 1px, transparent 0); background-size: 16px 16px; }
+    .wa-bg-light { background-color: #efeae2; background-image: radial-gradient(#cbd5e1 1px, transparent 0); background-size: 16px 16px; }
+    .cropper-container { max-height: 280px !important; }
+    .ratio-4-5 { aspect-ratio: 4 / 5; width: 100%; max-width: 400px; }
+    .sticker-grid-scroll { max-height: 140px; overflow-y: auto; }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 font-sans min-h-screen flex flex-col md:flex-row">
 <html lang="ms">
 <head>
   <meta charset="UTF-8">
@@ -45,7 +69,20 @@
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans min-h-screen flex flex-col md:flex-row">
 
-  <!-- ==================== LEFT PANEL: CONTROLS ==================== -->
+<!-- LEFT CONTROLS PANEL -->
+<div class="w-full md:w-1/2 lg:w-5/12 p-4 md:p-6 overflow-y-auto max-h-screen border-r border-gray-800 space-y-6">
+  <!-- Header & Mode Selector -->
+  <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+    <div>
+      <h1 class="text-xl font-bold text-emerald-400 flex items-center gap-2"><i class="fa-solid fa-mobile-screen"></i> AU Generator Pro</h1>
+      <p class="text-xs text-gray-400">Penyunting WhatsApp, Twitter/X & Simple Text</p>
+    </div>
+    <div class="flex bg-gray-900 border border-gray-700 p-1 rounded-lg">
+      <button id="btnAppWA" onclick="switchAppMode('wa')" class="px-2.5 py-1.5 rounded-md text-xs font-bold transition bg-emerald-600 text-white">WA</button>
+      <button id="btnAppTwitter" onclick="switchAppMode('twitter')" class="px-2.5 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white">X</button>
+      <button id="btnAppText" onclick="switchAppMode('text')" class="px-2.5 py-1.5 rounded-md text-xs font-bold transition text-gray-400 hover:text-white">Text</button>
+    </div>
+  </div>
   <div class="w-full md:w-1/2 lg:w-5/12 p-4 md:p-6 overflow-y-auto max-h-screen border-r border-gray-800 space-y-6">
 
     <!-- Header & App Mode Toggle -->
@@ -100,7 +137,24 @@
     <!-- ==================== WHATSAPP CONTROLS ==================== -->
     <div id="waControls" class="space-y-6">
 
-      <!-- 1. TETAPAN WHATSAPP -->
+<!-- 1. PENGURUSAN KONTAK & GROUP PROFIL (MAKS 40 ENTRI) -->
+<div class="bg-gray-900 border border-gray-800 p-4 rounded-xl space-y-3">
+  <div class="flex justify-between items-center">
+    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-address-book text-emerald-500"></i> Simpanan Kontak & Group (<span id="savedCountLabel">0/40</span>)</h2>
+    <button onclick="saveCurrentToPresets()" class="text-xs bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1 rounded-md">+ Simpan Profil</button>
+  </div>
+  <div id="savedProfilesList" class="flex gap-2 overflow-x-auto pb-1"></div>
+</div>
+<!-- 2. PENGURUS STICKER MULTI-UPLOAD & INDEXEDDB (MAKS 20 STICKER) -->
+<div class="bg-gray-900 border border-gray-800 p-4 rounded-xl space-y-3">
+  <div class="flex justify-between items-center">
+    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-note-sticky text-emerald-500"></i> Koleksi Sticker (<span id="stickerCountLabel">0/20</span>)</h2>
+    <label class="text-xs bg-gray-800 hover:bg-gray-700 text-emerald-400 px-2.5 py-1 rounded-md cursor-pointer border border-gray-700">
+      Upload Sticker (Multi)<input type="file" id="multiStickerInput" accept="image/*" multiple class="hidden" onchange="handleMultipleStickers(event)">
+    </label>
+  </div>
+  <div id="stickerTray" class="grid grid-cols-5 gap-2 sticker-grid-scroll p-1.5 bg-gray-950 rounded-lg border border-gray-800"></div>
+</div>
       <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl space-y-3">
         <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
           <i class="fa-solid fa-gear text-emerald-500"></i> Tetapan Utama WhatsApp
@@ -550,7 +604,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
       </div>
     </div>
 
-    <!-- 3. URUSAN SENARAI MESEJ & EKSPORT (UNIVERSAL) -->
+  <!-- 3. URUSAN SENARAI MESEJ & EKSPORT (UNIVERSAL) -->
     <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider">Senarai Item</h2>
@@ -693,7 +747,131 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
   </div>
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
-  <script>
+<script>
+// Inisialisasi IndexedDB untuk Koleksi Sticker (Had 20)
+let db = null;
+const DB_NAME = "AUGenDB";
+const STICKER_STORE = "stickers";
+let stickerQueue = [];
+let savedProfiles = JSON.parse(localStorage.getItem("au_profiles") || "[]"); // Had 40
+function initIndexedDB() {
+  const req = indexedDB.open(DB_NAME, 1);
+  req.onupgradeneeded = (e) => {
+    const d = e.target.result;
+    if (!d.objectStoreNames.contains(STICKER_STORE)) {
+      d.createObjectStore(STICKER_STORE, { keyPath: "id" });
+    }
+  };
+  req.onsuccess = (e) => {
+    db = e.target.result;
+    loadStickersFromDB();
+  };
+}
+function loadStickersFromDB() {
+  const tx = db.transaction([STICKER_STORE], "readonly");
+  const store = tx.objectStore(STICKER_STORE);
+  const req = store.getAll();
+  req.onsuccess = () => renderStickerTray(req.result || []);
+}
+function saveStickerToDB(sticker) {
+  const tx = db.transaction([STICKER_STORE], "readwrite");
+  const store = tx.objectStore(STICKER_STORE);
+  store.count().onsuccess = (c) => {
+    if (c.target.result >= 20) {
+      alert("Had maksimum 20 sticker tercapai. Sila padamkan sticker sedia ada.");
+      return;
+    }
+    store.put(sticker);
+    tx.oncomplete = () => loadStickersFromDB();
+  };
+}
+function deleteStickerFromDB(id) {
+  const tx = db.transaction([STICKER_STORE], "readwrite");
+  tx.objectStore(STICKER_STORE).delete(id);
+  tx.oncomplete = () => loadStickersFromDB();
+}
+function renderStickerTray(list) {
+  const tray = document.getElementById("stickerTray");
+  const label = document.getElementById("stickerCountLabel");
+  if (!tray) return;
+  label.innerText = `${list.length}/20`;
+  tray.innerHTML = list.map(s => `
+    <div class="relative group border border-gray-800 rounded p-1 bg-gray-900">
+      <img src="${s.src}" class="w-full h-12 object-contain cursor-pointer" onclick="selectQuickSticker('${s.src}')">
+      <button onclick="deleteStickerFromDB('${s.id}')" class="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 text-[9px] flex items-center justify-center opacity-0 group-hover:opacity-100">✕</button>
+    </div>
+  `).join("");
+}
+function handleMultipleStickers(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  stickerQueue = files;
+  processNextStickerQueue();
+}
+function processNextStickerQueue() {
+  if (!stickerQueue.length) return;
+  const file = stickerQueue.shift();
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    openCropper(ev.target.result, (cropped) => {
+      saveStickerToDB({ id: "stk_" + Date.now() + Math.random().toString(36).substr(2, 4), src: cropped });
+      processNextStickerQueue();
+    });
+  };
+  reader.readAsDataURL(file);
+}
+function selectQuickSticker(src) {
+  messages.push({ id: Date.now(), sender: document.getElementById('msgSender').value, type: 'sticker', src: src, time: document.getElementById('msgTime').value, reaction: '' });
+  renderMessages();
+}
+// Pengurusan Profil & Group Presets (Maks 40)
+function saveCurrentToPresets() {
+  if (savedProfiles.length >= 40) return alert("Had maksimum 40 profil disimpan!");
+  const isDm = currentMode === "dm";
+  const newProfile = {
+    id: "prof_" + Date.now(),
+    mode: currentMode,
+    title: isDm ? targetProfile.name : groupProfile.name,
+    subtitle: isDm ? targetProfile.status : "",
+    pfp: isDm ? targetProfile.pfp : groupProfile.pfp,
+    members: isDm ? [] : [...groupMembers]
+  };
+  savedProfiles.push(newProfile);
+  localStorage.setItem("au_profiles", JSON.stringify(savedProfiles));
+  renderSavedProfiles();
+}
+function renderSavedProfiles() {
+  const list = document.getElementById("savedProfilesList");
+  const count = document.getElementById("savedCountLabel");
+  if (!list) return;
+  count.innerText = `${savedProfiles.length}/40`;
+  list.innerHTML = savedProfiles.map((p, i) => `
+    <div class="flex-shrink-0 bg-gray-950 border border-gray-800 rounded-lg p-1.5 flex items-center gap-2">
+      <img src="${p.pfp}" class="w-6 h-6 rounded-full object-cover">
+      <span class="text-xs cursor-pointer text-gray-300 font-semibold truncate max-w-[80px]" onclick="applySavedProfile(${i})">${p.title}</span>
+      <button onclick="deleteSavedProfile(${i})" class="text-red-400 text-xs hover:text-red-300">✕</button>
+    </div>
+  `).join("");
+}
+function applySavedProfile(index) {
+  const p = savedProfiles[index];
+  switchChatMode(p.mode);
+  if (p.mode === "dm") {
+    targetProfile.name = p.title; targetProfile.status = p.subtitle; targetProfile.pfp = p.pfp;
+    document.getElementById("targetName").value = p.title;
+    document.getElementById("targetStatus").value = p.subtitle;
+  } else {
+    groupProfile.name = p.title; groupProfile.pfp = p.pfp; groupMembers = p.members || [];
+    document.getElementById("groupName").value = p.title;
+    renderMembersList();
+  }
+  updateHeader();
+}
+function deleteSavedProfile(index) {
+  savedProfiles.splice(index, 1);
+  localStorage.setItem("au_profiles", JSON.stringify(savedProfiles));
+  renderSavedProfiles();
+}
     let appMode = 'wa'; 
     let phoneLayout = 'phone'; 
     let phoneTheme = 'dark'; 
@@ -938,7 +1116,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
 
       let formatted = rawText.replace(/==(.*?)==/g, (match, p1) => {
         let hlBg = simpleTextConfig.highlight === 'transparent' ? highlightCol : simpleTextConfig.highlight;
-        return `<span style="background-color: ${hlBg}; padding: 0 4px; border-radius: 4px; font-weight: 600;">${p1}</span>`;
+        return `<span style="background-color: hlBg;padding:04px;border-radius:4px;font-weight:600;">{p1}</span>`;
       });
 
       textOutput.innerHTML = formatted;
@@ -951,6 +1129,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
           </div>`;
       }
     }
+
 
     // Mode Switching for WA
     function switchChatMode(mode) {
@@ -1066,7 +1245,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
         const tag = document.createElement('span');
         tag.className = "text-xs px-2 py-1 rounded flex items-center gap-1.5 text-black font-semibold";
         tag.style.backgroundColor = m.color;
-        tag.innerHTML = `${m.name} <i class="fa-solid fa-xmark cursor-pointer" onclick="removeGroupMember('${m.id}')"></i>`;
+        tag.innerHTML = `m.name<iclass="fa-solidfa-xmarkcursor-pointer"onclick="removeGroupMember('{m.id}')"></i>`;
         container.appendChild(tag);
 
         const opt = document.createElement('option');
@@ -1374,13 +1553,13 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
         if (m.type === 'divider') {
           chat.innerHTML += `
             <div class="flex justify-center my-2">
-              <span class="${isLight ? 'bg-white/90 text-gray-600 border-gray-200' : 'bg-[#111b21]/90 text-gray-400 border-gray-800/50'} text-[10px] font-medium px-2.5 py-1 rounded-md shadow-sm border">${m.text}</span>
+              <span class="isLight?'bg-white/90text-gray-600border-gray-200':'bg-[#111b21]/90text-gray-400border-gray-800/50'text-[10px]font-mediumpx-2.5py-1rounded-mdshadow-smborder">{m.text}</span>
             </div>`;
           lastLeftSenderId = null;
         } else if (m.sender === 'system') {
           chat.innerHTML += `
             <div class="flex justify-center my-1.5">
-              <span class="${isLight ? 'bg-amber-100 text-amber-900' : 'bg-[#182229] text-[#8696a0]'} text-[10.5px] px-3 py-1 rounded-lg text-center shadow-sm max-w-[85%]">${m.text}</span>
+              <span class="isLight?'bg-amber-100text-amber-900':'bg-[#182229]text-[#8696a0]'text-[10.5px]px-3py-1rounded-lgtext-centershadow-smmax-w-[85%]">{m.text}</span>
             </div>`;
           lastLeftSenderId = null;
         } else {
@@ -1445,7 +1624,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
             contentHTML = `<img src="${m.src}" class="rounded-lg max-w-full max-h-48 object-cover mb-1">`;
           } else if (m.type === 'sticker') {
             const avatarMargin = (!isRight && showPfp) ? 'ml-8' : '';
-            let reactBadge = m.reaction ? `<span class="absolute -bottom-2 ${isRight ? 'left-1' : 'right-1'} bg-[#202c33] border border-gray-700 px-1.5 py-0.5 rounded-full text-xs shadow">${m.reaction}</span>` : '';
+            let reactBadge = m.reaction ? `<span class="absolute -bottom-2 isRight?'left-1':'right-1'bg-[#202c33]borderborder-gray-700px-1.5py-0.5rounded-fulltext-xsshadow">{m.reaction}</span>` : '';
             chat.innerHTML += `
               <div class="flex ${isRight ? 'justify-end' : 'justify-start'} my-1 relative">
                 <div class="relative max-w-[130px] ${avatarMargin}">
@@ -1473,7 +1652,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
             const isMissed = m.callStatus === 'missed';
             const iconClass = m.callType === 'video' ? 'fa-video' : 'fa-phone';
             const iconColor = isMissed ? 'text-red-500' : 'text-emerald-500';
-            const callText = isMissed ? `Missed ${m.callType} call` : `${m.callType === 'video' ? 'Video' : 'Voice'} call (${m.callDuration})`;
+            const callText = isMissed ? `Missed m.callTypecall`:`{m.callType === 'video' ? 'Video' : 'Voice'} call (${m.callDuration})`;
 
             contentHTML = `
               <div class="flex items-center gap-3 min-w-[170px] py-1">
@@ -1488,8 +1667,8 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
           }
 
           let pfpTag = !isRight ? (showPfp ? `<img src="${senderPfpUrl}" class="w-7 h-7 rounded-full object-cover self-end mb-1 mr-1.5 shadow-sm">` : `<div class="w-7 mr-1.5"></div>`) : '';
-          let nameTag = (!isRight && currentMode === 'group' && senderName) ? `<p class="text-[11px] font-bold mb-0.5" style="color:${senderColor}">${senderName}</p>` : '';
-          let reactBadge = m.reaction ? `<span class="absolute -bottom-2.5 ${isRight ? 'left-2' : 'right-2'} ${isLight ? 'bg-white border-gray-200' : 'bg-[#202c33] border-gray-700'} border px-1.5 py-0.5 rounded-full text-[11px] shadow-md z-10">${m.reaction}</span>` : '';
+          let nameTag = (!isRight && currentMode === 'group' && senderName) ? `<p class="text-[11px] font-bold mb-0.5" style="color:senderColor">{senderName}</p>` : '';
+          let reactBadge = m.reaction ? `<span class="absolute -bottom-2.5 ${isRight ? 'left-2' : 'right-2'} isLight?'bg-whiteborder-gray-200':'bg-[#202c33]border-gray-700'borderpx-1.5py-0.5rounded-fulltext-[11px]shadow-mdz-10">{m.reaction}</span>` : '';
 
           let metaBlock = !hideMeta ? `
             <div class="flex items-center justify-end gap-1 text-[9.5px] ${isLight ? 'text-gray-500' : 'text-gray-400/80'} -mb-0.5 mt-0.5">
@@ -1512,7 +1691,7 @@ Tetapi kita cuma mahu seseorang mendengar tanpa perlu menghukum."</textarea>
         if (appMode === 'wa') {
           list.innerHTML += `
             <div class="bg-gray-950 p-2 rounded flex justify-between items-center text-xs">
-              <span class="truncate max-w-[200px] text-gray-300">#${idx+1} [${m.type}] ${m.text || m.statusText || 'ViewOnce/VN/Deleted'} ${m.reaction ? '('+m.reaction+')' : ''}</span>
+              <span class="truncate max-w-[200px] text-gray-300">#idx+1[{m.type}] ${m.text || m.statusText || 'ViewOnce/VN/Deleted'} ${m.reaction ? '('+m.reaction+')' : ''}</span>
               <button onclick="deleteMessage(${m.id})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
             </div>`;
         }
